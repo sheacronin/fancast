@@ -14,6 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.Apis.Books.v1" Version="1.63.0.2955" />
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="7.0.13" />
   </ItemGroup>
 
