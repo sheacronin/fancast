@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Google.Apis.Books.v1;
 using Google.Apis.Services;
 using fancast.Models;
@@ -29,6 +30,7 @@ public class BooksController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [OutputCache]
     public async Task<Book> Get(string id)
     {
       var result = await Service.Volumes.Get(id).ExecuteAsync();
