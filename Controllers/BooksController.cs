@@ -44,4 +44,19 @@ public class BooksController : ControllerBase
         };
       return book;
     }
+
+    [HttpGet("search/{title}")]
+    [OutputCache]
+    public async Task<IList<Book>> SearchByTitle(string title)
+    {
+      var result = await Service.Volumes.List($"title={title}").ExecuteAsync();
+      var books = result.Items.Select(book => new Book() {
+        Id = book.Id, 
+        Title = book.VolumeInfo.Title,
+        Authors = book.VolumeInfo.Authors,
+        Description = book.VolumeInfo.Description,
+        ImageLink = book.VolumeInfo.ImageLinks.Large
+      }).ToList();
+      return books;
+    }
 }
