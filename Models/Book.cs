@@ -4,7 +4,7 @@ public class Book
 {
   public required string Id { get; set; }
   public required string Title { get; set; }
-  public required IList<string> Authors { get; set; }
-  public required string ImageLink { get; set; }
-  public required string Description { get; set; }
+  public IList<string>? Authors { get; set; }
+  public string? ImageLink { get; set; }
+  public string? Description { get; set; }
 }
