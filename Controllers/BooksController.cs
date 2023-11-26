@@ -78,7 +78,10 @@ public class BooksController : ControllerBase
     [OutputCache]
     public async Task<IList<Book>> SearchByTitle(string title)
     {
-      var result = await Service.Volumes.List($"title={title}").ExecuteAsync();
+      var request = Service.Volumes.List($"title={title}");
+      request.OrderBy = VolumesResource.ListRequest.OrderByEnum.Relevance;
+      request.LangRestrict = "en";
+      var result = await request.ExecuteAsync();
       var books = result.Items.Select(book => new Book() {
         Id = book.Id, 
         Title = book.VolumeInfo.Title,
