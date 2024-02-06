@@ -43,7 +43,7 @@ export const Home = () => {
                 </Col>
                 <Col className="ms-3">
                   <h5>
-                    <Link to={`/books/${book.id}`}>{book.title} </Link>
+                    <Link to={`/books/${book.id}`}>{book.title}</Link>
                   </h5>
                   {book.authors && <h6>{book.authors[0]}</h6>}
                 </Col>

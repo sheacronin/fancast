@@ -1,17 +1,21 @@
 import React from 'react';
-import type { ReactNode } from 'react';
-import { Container } from 'react-bootstrap';
+import { Outlet, Link } from 'react-router-dom';
+import { Container, Navbar } from 'react-bootstrap';
 
-interface AppProps {
-  children: ReactNode;
-}
-
-const App = ({ children }: AppProps) => {
+const App = () => {
   return (
-    <Container fluid as="main" className="py-5">
-      <h1 className="text-center">Fancast</h1>
-      {children}
-    </Container>
+    <>
+      <Navbar bg="dark" className="mb-4" data-bs-theme="dark">
+        <Container>
+          <Navbar.Brand>
+            <Link to="/">Fancast</Link>
+          </Navbar.Brand>
+        </Container>
+      </Navbar>
+      <Container as="main" className="pb-5">
+        <Outlet />
+      </Container>
+    </>
   );
 };
 
