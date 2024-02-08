@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Row, Col, Image, Button } from 'react-bootstrap';
+import { Row, Col, Image } from 'react-bootstrap';
 import type { Book as BookI } from '../../types';
+import { Characters } from './components/Characters';
 
 export const Book = () => {
   const { id } = useParams();
@@ -40,13 +41,7 @@ export const Book = () => {
           )}
         </Col>
       </Row>
-      <Row className="justify-content-center text-center" as="section">
-        <h4>Characters</h4>
-        <hr />
-        <Col xs={2}>
-          <Button>+ Add Character</Button>
-        </Col>
-      </Row>
+      <Characters />
     </article>
   );
 };
