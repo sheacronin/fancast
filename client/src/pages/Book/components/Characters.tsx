@@ -3,6 +3,8 @@ import type { FormEvent } from 'react';
 import {
   Row,
   Col,
+  Image,
+  Dropdown,
   Button,
   Form,
   InputGroup,
@@ -20,7 +22,22 @@ export const Characters = () => {
       <Row>
         {characters.map((character) => (
           <Col xs={12} md={6} lg={4} className="p-3">
-            {character.name}
+            <p>{character.name}</p>
+            <Image
+              src="https://upload.wikimedia.org/wikipedia/commons/b/bc/Unknown_person.jpg"
+              alt="Unknown person"
+              className="w-50"
+              rounded
+            />
+            <Dropdown className="mt-3">
+              <Dropdown.Toggle variant="light">
+                <i>No casting selected</i>
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item>Actor A</Dropdown.Item>
+                <Dropdown.Item>Actor B</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
           </Col>
         ))}
       </Row>
