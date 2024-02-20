@@ -11,6 +11,7 @@ import {
 } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import type { Book } from '../../types';
+import { API_BASE_URL } from '../../constants';
 
 export const Home = () => {
   const [booksList, setBooksList] = useState<Book[]>([]);
@@ -61,7 +62,9 @@ export const Home = () => {
     const { search } = e.target as typeof e.target & {
       search: { value: string };
     };
-    const response = await fetch(`books/search/${search.value}`);
+    const response = await fetch(
+      `${API_BASE_URL}/books/search/${search.value}`
+    );
     const data = await response.json();
     console.log(data);
     setBooksList(data);

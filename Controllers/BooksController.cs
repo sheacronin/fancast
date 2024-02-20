@@ -8,7 +8,7 @@ using fancast.Models;
 namespace fancast.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class BooksController : ControllerBase
 {
     private readonly ILogger<BooksController> _logger;

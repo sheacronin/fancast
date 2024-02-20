@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Row, Col, Image } from 'react-bootstrap';
 import type { Book as BookI } from '../../types';
 import { Characters } from './components/Characters';
+import { API_BASE_URL } from '../../constants';
 
 export const Book = () => {
   const { id } = useParams();
@@ -11,7 +12,7 @@ export const Book = () => {
   useEffect(() => {
     if (id) {
       const getBook = async () => {
-        const response = await fetch(id);
+        const response = await fetch(`${API_BASE_URL}/books/${id}`);
         const data = await response.json();
         console.log(data);
         setBook(data);
@@ -41,7 +42,7 @@ export const Book = () => {
           )}
         </Col>
       </Row>
-      <Characters />
+      <Characters bookId={book.id} />
     </article>
   );
 };
