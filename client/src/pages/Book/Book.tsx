@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Row, Col, Image } from 'react-bootstrap';
 import type { Book as BookI } from '../../types';
-import { Characters } from './components/Characters';
+import { CharactersSection } from './components/CharactersSection';
 import { API_BASE_URL } from '../../constants';
 
 export const Book = () => {
@@ -42,7 +42,7 @@ export const Book = () => {
           )}
         </Col>
       </Row>
-      <Characters bookId={book.id} />
+      <CharactersSection bookId={book.id} />
     </article>
   );
 };

@@ -5,3 +5,10 @@ export interface Book {
   imageLink?: string;
   description?: string;
 }
+
+export interface Character {
+  id: string;
+  name: string;
+  castIds?: string[];
+  bookId: string;
+}

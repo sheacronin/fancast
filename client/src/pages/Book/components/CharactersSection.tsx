@@ -1,19 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
+import { Character } from './Character';
 import {
   Row,
   Col,
-  Image,
-  Dropdown,
   Button,
   Form,
   InputGroup,
   FloatingLabel,
 } from 'react-bootstrap';
+import type { Character as CharacterI } from '../../../types';
+import { API_BASE_URL } from '../../../constants';
 
-export const Characters = () => {
-  const [characters, setCharacters] = useState([{ name: 'Giovanni' }]);
+interface CharacterProps {
+  bookId: string;
+}
+
+export const CharactersSection = ({ bookId }: CharacterProps) => {
+  const [characters, setCharacters] = useState<CharacterI[]>([]);
   const [addingCharacter, setAddingCharacter] = useState<Boolean>(false);
+
+  useEffect(() => {
+    fetchCharacters();
+
+    async function fetchCharacters() {
+      const response = await fetch(`${API_BASE_URL}/characters/book/${bookId}`);
+      const data = await response.json();
+      console.log(data);
+      setCharacters(data);
+    }
+  }, [bookId]);
 
   return (
     <Row className="justify-content-center text-center" as="section">
@@ -21,24 +37,7 @@ export const Characters = () => {
       <hr />
       <Row>
         {characters.map((character) => (
-          <Col xs={12} md={6} lg={4} className="p-3">
-            <p>{character.name}</p>
-            <Image
-              src="https://upload.wikimedia.org/wikipedia/commons/b/bc/Unknown_person.jpg"
-              alt="Unknown person"
-              className="w-50"
-              rounded
-            />
-            <Dropdown className="mt-3">
-              <Dropdown.Toggle variant="light">
-                <i>No casting selected</i>
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <Dropdown.Item>Actor A</Dropdown.Item>
-                <Dropdown.Item>Actor B</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-          </Col>
+          <Character name={character.name} key={character.id} />
         ))}
       </Row>
       <Row className="justify-content-center">
@@ -73,14 +72,14 @@ export const Characters = () => {
   function handleCharacterSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    const { character } = e.target as typeof e.target & {
-      character: { value: string };
-    };
+    // const { character } = e.target as typeof e.target & {
+    //   character: { value: string };
+    // };
 
-    setCharacters((prevCharacters) => [
-      ...prevCharacters,
-      { name: character.value },
-    ]);
+    // setCharacters((prevCharacters) => [
+    //   ...prevCharacters,
+    //   { name: character.value },
+    // ]);
     setAddingCharacter(false);
   }
 };
