@@ -15,5 +15,5 @@ public class Character
   public required string BookId { get; set; }
 
   [FirestoreProperty("cast_ids")]
-  public IList<string>? CastIds { get; set; }
+  public required IList<string> CastIds { get; set; }
 }
