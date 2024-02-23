@@ -1,14 +1,8 @@
 import { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import { Character } from './Character';
-import {
-  Row,
-  Col,
-  Button,
-  Form,
-  InputGroup,
-  FloatingLabel,
-} from 'react-bootstrap';
+import { InputBar } from '../../../components';
+import { Row, Col, Button } from 'react-bootstrap';
 import type { Character as CharacterI } from '../../../types';
 import { API_BASE_URL } from '../../../constants';
 
@@ -49,20 +43,19 @@ export const CharactersSection = ({ bookId }: CharacterProps) => {
           <Button
             onClick={toggleAddingCharacter}
             variant={!addingCharacter ? 'primary' : 'secondary'}
+            className="mb-3"
           >
             {!addingCharacter ? '+ Add Character' : 'Cancel'}
           </Button>
           {addingCharacter && (
-            <Form className="mt-3" onSubmit={handleCharacterSubmit}>
-              <InputGroup>
-                <FloatingLabel controlId="character" label="Character name">
-                  <Form.Control type="text" placeholder="Ponyboy Curtis" />
-                </FloatingLabel>
-                <Button variant="primary" type="submit">
-                  Submit
-                </Button>
-              </InputGroup>
-            </Form>
+            <InputBar
+              handleSubmit={handleCharacterSubmit}
+              controlId="character"
+              label="Character name"
+              placeholder="Ponyboy Curtis"
+              buttonText="Submit"
+              floatingLabel
+            />
           )}
         </Col>
       </Row>

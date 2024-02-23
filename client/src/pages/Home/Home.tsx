@@ -1,15 +1,8 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import {
-  Row,
-  Col,
-  Form,
-  InputGroup,
-  Button,
-  ListGroup,
-  Image,
-} from 'react-bootstrap';
+import { Row, Col, ListGroup, Image } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { InputBar } from '../../components';
 import type { Book } from '../../types';
 import { API_BASE_URL } from '../../constants';
 
@@ -19,17 +12,13 @@ export const Home = () => {
   return (
     <Row className="justify-content-center">
       <Col md={8}>
-        <Form onSubmit={handleSearchSubmit}>
-          <Form.Group controlId="search">
-            <Form.Label>Book search</Form.Label>
-            <InputGroup>
-              <Form.Control type="text" placeholder="Book title" />
-              <Button variant="primary" type="submit">
-                Search
-              </Button>
-            </InputGroup>
-          </Form.Group>
-        </Form>
+        <InputBar
+          handleSubmit={handleBookSearch}
+          controlId="search"
+          label="Book search"
+          placeholder="Book title"
+          buttonText="Search"
+        />
         {booksList.length > 0 && (
           <ListGroup as="ul" variant="flush" className="border rounded-bottom">
             {booksList.map((book) => (
@@ -56,7 +45,7 @@ export const Home = () => {
     </Row>
   );
 
-  async function handleSearchSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleBookSearch(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     const { search } = e.target as typeof e.target & {
