@@ -37,7 +37,11 @@ export const CharactersSection = ({ bookId }: CharacterProps) => {
       <hr />
       <Row>
         {characters.map((character) => (
-          <Character name={character.name} key={character.id} />
+          <Character
+            id={character.id}
+            name={character.name}
+            key={character.id}
+          />
         ))}
       </Row>
       <Row className="justify-content-center">
