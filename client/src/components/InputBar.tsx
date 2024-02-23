@@ -6,7 +6,7 @@ interface InputBarProps {
   controlId: string;
   label: string;
   placeholder: string;
-  buttonText: string;
+  buttonText?: string;
   floatingLabel?: boolean;
 }
 
@@ -15,7 +15,7 @@ export const InputBar = ({
   controlId,
   label,
   placeholder,
-  buttonText,
+  buttonText = 'Search',
   floatingLabel = false,
 }: InputBarProps) => {
   const formControl = <Form.Control type="text" placeholder={placeholder} />;

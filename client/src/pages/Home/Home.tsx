@@ -17,7 +17,6 @@ export const Home = () => {
           controlId="search"
           label="Book search"
           placeholder="Book title"
-          buttonText="Search"
         />
         {booksList.length > 0 && (
           <ListGroup as="ul" variant="flush" className="border rounded-bottom">
