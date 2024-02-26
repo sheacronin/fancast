@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Col, Image, Dropdown } from 'react-bootstrap';
+import { CastingModal } from './CastingModal';
 import type { Cast } from '../../../types';
 import { API_BASE_URL } from '../../../constants';
 
@@ -11,6 +12,7 @@ interface CharacterProps {
 export const Character = ({ id, name }: CharacterProps) => {
   const [castings, setCastings] = useState<Cast[]>([]);
   const [selectedCastId, setSelectedCastId] = useState<string | null>(null);
+  const [addingCasting, setAddingCasting] = useState<boolean>(false);
 
   const selectedCast = castings.find((cast) => cast.id === selectedCastId);
 
@@ -38,7 +40,12 @@ export const Character = ({ id, name }: CharacterProps) => {
         className="w-50"
         rounded
       />
-      <Dropdown className="mt-3" onSelect={selectCasting}>
+      <Dropdown
+        className="mt-3"
+        onSelect={(eventKey) =>
+          eventKey === 'ADD' ? setAddingCasting(true) : selectCasting(eventKey)
+        }
+      >
         <Dropdown.Toggle variant="light">
           {selectedCast ? selectedCast.name : <i>No casting selected</i>}
         </Dropdown.Toggle>
@@ -48,9 +55,11 @@ export const Character = ({ id, name }: CharacterProps) => {
               {casting.name}
             </Dropdown.Item>
           ))}
-          <Dropdown.Item>+ Add new casting</Dropdown.Item>
+          <Dropdown.Item eventKey="ADD">+ Add new casting</Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
+
+      <CastingModal show={addingCasting} hide={() => setAddingCasting(false)} />
     </Col>
   );
 
