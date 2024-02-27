@@ -1,29 +1,16 @@
-import { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import { Character } from './Character';
 import { InputBar } from '../../../components';
 import { Row, Col, Button } from 'react-bootstrap';
-import type { Character as CharacterI } from '../../../types';
-import { API_BASE_URL } from '../../../constants';
+import { useCharacters } from '../../../hooks/useCharacters';
 
 interface CharacterProps {
   bookId: string;
 }
 
 export const CharactersSection = ({ bookId }: CharacterProps) => {
-  const [characters, setCharacters] = useState<CharacterI[]>([]);
-  const [addingCharacter, setAddingCharacter] = useState<Boolean>(false);
-
-  useEffect(() => {
-    fetchCharacters();
-
-    async function fetchCharacters() {
-      const response = await fetch(`${API_BASE_URL}/characters/book/${bookId}`);
-      const data = await response.json();
-      console.log(data);
-      setCharacters(data);
-    }
-  }, [bookId]);
+  const { characters, addingCharacter, addCharacter, toggleAddingCharacter } =
+    useCharacters(bookId);
 
   return (
     <Row className="justify-content-center text-center" as="section">
@@ -50,7 +37,7 @@ export const CharactersSection = ({ bookId }: CharacterProps) => {
           {addingCharacter && (
             <InputBar
               handleSubmit={handleCharacterSubmit}
-              controlId="character"
+              controlId="characterName"
               label="Character name"
               placeholder="Ponyboy Curtis"
               buttonText="Submit"
@@ -62,21 +49,20 @@ export const CharactersSection = ({ bookId }: CharacterProps) => {
     </Row>
   );
 
-  function toggleAddingCharacter() {
-    setAddingCharacter((prevState) => !prevState);
-  }
-
   function handleCharacterSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    // const { character } = e.target as typeof e.target & {
-    //   character: { value: string };
-    // };
+    const { characterName } = e.target as typeof e.target & {
+      characterName: { value: string };
+    };
 
-    // setCharacters((prevCharacters) => [
-    //   ...prevCharacters,
-    //   { name: character.value },
-    // ]);
-    setAddingCharacter(false);
+    const character = {
+      id: '',
+      name: characterName.value,
+      castIds: [],
+      bookId,
+    };
+
+    addCharacter(character);
   }
 };

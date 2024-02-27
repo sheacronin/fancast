@@ -36,11 +36,18 @@ public class CharactersController : ControllerBase
   [HttpPut("{id}/addCasting")]
   public async Task<WriteResult> AddCasting(string id, [FromBody] string actorId)
   {
-    Console.WriteLine($"Adding {actorId}");
     DocumentReference characterRef = db.Collection("characters").Document(id);
     DocumentSnapshot characterSnapshot = await characterRef.GetSnapshotAsync();
     var castIds = characterSnapshot.GetValue<IList<string>>("cast_ids");
     castIds.Add(actorId);
     return await characterRef.UpdateAsync("cast_ids", castIds);
+  }
+
+  [HttpPost]
+  public async Task<Character> AddCharacter([FromBody] Character character)
+  {
+    DocumentReference addedCharacterRef = await db.Collection("characters").AddAsync(character);
+    DocumentSnapshot addedCharacter = await addedCharacterRef.GetSnapshotAsync();
+    return addedCharacter.ConvertTo<Character>();
   }
 }

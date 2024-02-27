@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Modal, Button, ListGroup, Col, Image } from 'react-bootstrap';
+import { Modal, ListGroup, Col, Image } from 'react-bootstrap';
 import { InputBar } from '../../../components';
 import type { Cast } from '../../../types';
 import { API_BASE_URL } from '../../../constants';
@@ -38,14 +38,7 @@ export const CastingModal = ({
           </ListGroup>
         )}
       </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={console.log}>
-          Close
-        </Button>
-        <Button variant="primary" onClick={console.log}>
-          Save Changes
-        </Button>
-      </Modal.Footer>
+      <Modal.Footer></Modal.Footer>
     </Modal>
   );
 
