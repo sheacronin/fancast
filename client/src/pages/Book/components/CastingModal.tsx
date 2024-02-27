@@ -8,9 +8,14 @@ import { API_BASE_URL } from '../../../constants';
 interface AddCastModalProps {
   show: boolean;
   hide: () => void;
+  characterId: string;
 }
 
-export const CastingModal = ({ show, hide }: AddCastModalProps) => {
+export const CastingModal = ({
+  show,
+  hide,
+  characterId,
+}: AddCastModalProps) => {
   const [searchResults, setSearchResults] = useState<Cast[]>([]);
 
   return (
@@ -28,7 +33,7 @@ export const CastingModal = ({ show, hide }: AddCastModalProps) => {
         {searchResults.length > 0 && (
           <ListGroup variant="flush" className="border rounded-bottom">
             {searchResults.map((actor) => (
-              <Actor actor={actor} handleHide={handleHide} key={actor.id} />
+              <Actor actor={actor} addCasting={addCasting} key={actor.id} />
             ))}
           </ListGroup>
         )}
@@ -58,6 +63,15 @@ export const CastingModal = ({ show, hide }: AddCastModalProps) => {
     setSearchResults(data);
   }
 
+  async function addCasting(actorId: string) {
+    await fetch(`${API_BASE_URL}/characters/${characterId}/addCasting`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(actorId),
+    });
+    handleHide();
+  }
+
   function handleHide() {
     hide();
     setSearchResults([]);
@@ -66,14 +80,14 @@ export const CastingModal = ({ show, hide }: AddCastModalProps) => {
 
 interface ActorProps {
   actor: Cast;
-  handleHide: () => void;
+  addCasting: (actorId: string) => Promise<void>;
 }
 
-const Actor = ({ actor, handleHide }: ActorProps) => {
+const Actor = ({ actor, addCasting }: ActorProps) => {
   return (
     <ListGroup.Item
       action
-      onClick={addCasting}
+      onClick={() => addCasting(actor.id)}
       variant="primary"
       className="d-flex"
     >
@@ -85,9 +99,4 @@ const Actor = ({ actor, handleHide }: ActorProps) => {
       </Col>
     </ListGroup.Item>
   );
-
-  function addCasting() {
-    console.log(`Adding ${actor.name}...`);
-    handleHide();
-  }
 };

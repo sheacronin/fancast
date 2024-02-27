@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OutputCaching;
 using Google.Cloud.Firestore;
 using fancast.Models;
 using TMDbLib.Client;
@@ -20,28 +19,27 @@ public class CastController : ControllerBase
     _logger = logger;
   }
 
-  static FirestoreDb Db
-  {
-    get
-    {
-      return FirestoreDb.Create("fancast-api");
-    }
-  }
+  static readonly FirestoreDb db = FirestoreDb.Create("fancast-api");
 
   static readonly TMDbClient client = new(Environment.GetEnvironmentVariable("TMDB_API_KEY"));
 
   [HttpGet("{id}")]
-  public async Task<Cast> Get(string id)
+  public async Task<Cast> Get(int id)
   {
-    DocumentReference castRef = Db.Collection("cast").Document(id);
-    DocumentSnapshot castSnapshot = await castRef.GetSnapshotAsync();
-    return castSnapshot.ConvertTo<Cast>();
+    Person person = await client.GetPersonAsync(id);
+    return new Cast()
+    {
+      Id = person.Id.ToString(),
+      Name = person.Name,
+      Gender = person.Gender.ToString(),
+      ImageLink = person.ProfilePath
+    };
   }
 
   [HttpGet("character/{characterId}")]
   public async Task<IEnumerable<Cast>> GetCharacterCast(string characterId)
   {
-    DocumentReference characterRef = Db.Collection("characters").Document(characterId);
+    DocumentReference characterRef = db.Collection("characters").Document(characterId);
     DocumentSnapshot characterSnapshot = await characterRef.GetSnapshotAsync();
     Character character = characterSnapshot.ConvertTo<Character>();
 
@@ -51,14 +49,23 @@ public class CastController : ControllerBase
       return Array.Empty<Cast>();
     }
 
-    Query castQuery = Db.Collection("cast").WhereIn(FieldPath.DocumentId, character.CastIds);
-    QuerySnapshot castSnapshot = await castQuery.GetSnapshotAsync();
-    Cast[] castings = castSnapshot.Select(cast => cast.ConvertTo<Cast>()).ToArray();
+    IList<Cast> castings = new List<Cast>();
+    foreach (string id in character.CastIds)
+    {
+      Person person = await client.GetPersonAsync(Int32.Parse(id));
+      Cast casting = new()
+      {
+        Id = person.Id.ToString(),
+        Name = person.Name,
+        Gender = person.Gender.ToString(),
+        ImageLink = person.ProfilePath
+      };
+      castings.Add(casting);
+    }
     return castings;
   }
 
   [HttpGet("search/{query}")]
-  [OutputCache(NoStore = true)]
   public async Task<IEnumerable<Cast>> Search(string query)
   {
     SearchContainer<SearchPerson> results = await client.SearchPersonAsync(query);

@@ -59,7 +59,11 @@ export const Character = ({ id, name }: CharacterProps) => {
         </Dropdown.Menu>
       </Dropdown>
 
-      <CastingModal show={addingCasting} hide={() => setAddingCasting(false)} />
+      <CastingModal
+        show={addingCasting}
+        hide={() => setAddingCasting(false)}
+        characterId={id}
+      />
     </Col>
   );
 

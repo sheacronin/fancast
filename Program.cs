@@ -23,7 +23,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseOutputCache();
+// app.UseOutputCache();
 
 app.MapControllerRoute(
     name: "api",
