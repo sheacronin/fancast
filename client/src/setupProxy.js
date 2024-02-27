@@ -7,7 +7,7 @@ const target = env.ASPNETCORE_HTTPS_PORT
   ? env.ASPNETCORE_URLS.split(';')[0]
   : 'http://localhost:11301';
 
-const context = ['/api'];
+const context = ['/api', '/swagger'];
 
 const onError = (err, req, resp, target) => {
   console.error(`${err.message}`);

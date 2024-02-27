@@ -3,6 +3,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddOutputCache(options =>
 {
     options.AddBasePolicy(builder =>
@@ -26,6 +28,9 @@ app.UseOutputCache();
 app.MapControllerRoute(
     name: "api",
     pattern: "{controller}/{action=Index}/{id?}");
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.MapFallbackToFile("index.html");
 
