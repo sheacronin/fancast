@@ -1,8 +1,6 @@
-import { useState, useEffect } from 'react';
 import { Col, Image, Dropdown } from 'react-bootstrap';
 import { CastingModal } from './CastingModal';
-import type { Cast } from '../../../types';
-import { API_BASE_URL } from '../../../constants';
+import { useActors } from '../../../hooks/useActors';
 
 interface CharacterProps {
   id: string;
@@ -10,49 +8,39 @@ interface CharacterProps {
 }
 
 export const Character = ({ id, name }: CharacterProps) => {
-  const [castings, setCastings] = useState<Cast[]>([]);
-  const [selectedCastId, setSelectedCastId] = useState<string | null>(null);
-  const [addingCasting, setAddingCasting] = useState<boolean>(false);
-
-  const selectedCast = castings.find((cast) => cast.id === selectedCastId);
-
-  useEffect(() => {
-    fetchCast();
-
-    async function fetchCast() {
-      const response = await fetch(`${API_BASE_URL}/cast/character/${id}`);
-      const data = await response.json();
-      console.log(data);
-      setCastings(data);
-    }
-  }, [id]);
+  const { actors, selectedActor, addingActor, selectActor, toggleAddingActor } =
+    useActors(id);
 
   return (
     <Col xs={12} md={6} lg={4} className="p-3">
       <p>{name}</p>
       <Image
-        src={
-          selectedCast
-            ? selectedCast.imageLink
-            : 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Unknown_person.jpg'
-        }
-        alt={selectedCast ? selectedCast.name : 'Unknown person'}
+        src={selectedActor.imageLink}
+        alt={selectedActor.name}
         className="w-50"
         rounded
       />
       <Dropdown
         className="mt-3"
-        onSelect={(eventKey) =>
-          eventKey === 'ADD' ? setAddingCasting(true) : selectCasting(eventKey)
-        }
+        onSelect={(eventKey) => {
+          if (eventKey) {
+            eventKey === 'ADD'
+              ? toggleAddingActor(true)
+              : selectActor(eventKey);
+          }
+        }}
       >
         <Dropdown.Toggle variant="light">
-          {selectedCast ? selectedCast.name : <i>No casting selected</i>}
+          {selectedActor.id === 'PLACEHOLDER' ? (
+            <i>No casting selected</i>
+          ) : (
+            selectedActor.name
+          )}
         </Dropdown.Toggle>
         <Dropdown.Menu>
-          {castings.map((casting) => (
-            <Dropdown.Item eventKey={casting.id} key={casting.id}>
-              {casting.name}
+          {actors.map((actor) => (
+            <Dropdown.Item eventKey={actor.id} key={actor.id}>
+              {actor.name}
             </Dropdown.Item>
           ))}
           <Dropdown.Item eventKey="ADD">+ Add new casting</Dropdown.Item>
@@ -60,14 +48,10 @@ export const Character = ({ id, name }: CharacterProps) => {
       </Dropdown>
 
       <CastingModal
-        show={addingCasting}
-        hide={() => setAddingCasting(false)}
+        show={addingActor}
+        hide={() => toggleAddingActor(false)}
         characterId={id}
       />
     </Col>
   );
-
-  function selectCasting(castId: string | null) {
-    setSelectedCastId(castId);
-  }
 };

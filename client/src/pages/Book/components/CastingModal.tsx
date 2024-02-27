@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Modal, ListGroup, Col, Image } from 'react-bootstrap';
 import { InputBar } from '../../../components';
-import type { Cast } from '../../../types';
+import type { Actor as IActor } from '../../../types';
 import { API_BASE_URL } from '../../../constants';
 
 interface AddCastModalProps {
@@ -16,7 +16,7 @@ export const CastingModal = ({
   hide,
   characterId,
 }: AddCastModalProps) => {
-  const [searchResults, setSearchResults] = useState<Cast[]>([]);
+  const [searchResults, setSearchResults] = useState<IActor[]>([]);
 
   return (
     <Modal show={show} onHide={handleHide} backdrop="static">
@@ -72,7 +72,7 @@ export const CastingModal = ({
 };
 
 interface ActorProps {
-  actor: Cast;
+  actor: IActor;
   addCasting: (actorId: string) => Promise<void>;
 }
 

@@ -13,7 +13,7 @@ export interface Character {
   bookId: string;
 }
 
-export interface Cast {
+export interface Actor {
   id: string;
   name: string;
   gender: 'male' | 'female' | 'nonbinary';

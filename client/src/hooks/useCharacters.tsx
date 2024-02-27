@@ -38,12 +38,11 @@ export const useCharacters = (bookId: string) => {
     }
   };
 
-  const toggleAddingCharacter = () => {
+  const toggleAddingCharacter = () =>
     dispatch({
       payload: !state.addingCharacter,
       type: CharactersActionType.TOGGLE_ADDING,
     });
-  };
 
   useEffect(() => {
     getBookCharacters();
