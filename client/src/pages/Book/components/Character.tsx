@@ -8,8 +8,14 @@ interface CharacterProps {
 }
 
 export const Character = ({ id, name }: CharacterProps) => {
-  const { actors, selectedActor, addingActor, selectActor, toggleAddingActor } =
-    useActors(id);
+  const {
+    actors,
+    selectedActor,
+    addingActor,
+    selectActor,
+    toggleAddingActor,
+    addActor,
+  } = useActors(id);
 
   return (
     <Col xs={12} md={6} lg={4} className="p-3">
@@ -50,7 +56,7 @@ export const Character = ({ id, name }: CharacterProps) => {
       <CastingModal
         show={addingActor}
         hide={() => toggleAddingActor(false)}
-        characterId={id}
+        addActor={addActor}
       />
     </Col>
   );

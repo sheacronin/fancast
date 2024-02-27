@@ -6,6 +6,7 @@ enum ActorsActionType {
   GET_ACTORS = 'GET_ACTORS',
   SELECT_ACTOR = 'SELECT_ACTOR',
   TOGGLE_ADDING = 'TOGGLE_ADDING',
+  ADD_ACTOR = 'ADD_ACTOR',
 }
 
 export const useActors = (characterId: string) => {
@@ -35,11 +36,34 @@ export const useActors = (characterId: string) => {
       payload: value,
     });
 
+  const addActor = async (actor: Actor) => {
+    try {
+      await fetch(`${API_BASE_URL}/characters/${characterId}/addCasting`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(actor.id),
+      });
+      dispatch({
+        type: ActorsActionType.ADD_ACTOR,
+        payload: [...state.actors, actor],
+      });
+      selectActor(actor.id);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     getActors();
   }, [getActors]);
 
-  return { ...state, selectedActor, selectActor, toggleAddingActor };
+  return {
+    ...state,
+    selectedActor,
+    selectActor,
+    toggleAddingActor,
+    addActor,
+  };
 };
 
 interface ActorsState {
@@ -58,12 +82,18 @@ const reducer = (state: ActorsState, action: ActorsAction) => {
       return { ...state, selectedActorId: action.payload };
     case ActorsActionType.TOGGLE_ADDING:
       return { ...state, addingActor: action.payload };
+    case ActorsActionType.ADD_ACTOR:
+      return { ...state, actors: action.payload };
     default:
       return state;
   }
 };
 
-type ActorsAction = ActionGetActor | ActionSelectActor | ActionToggleAdding;
+type ActorsAction =
+  | ActionGetActor
+  | ActionSelectActor
+  | ActionToggleAdding
+  | ActionAddActor;
 
 interface ActionGetActor {
   type: ActorsActionType.GET_ACTORS;
@@ -78,6 +108,11 @@ interface ActionSelectActor {
 interface ActionToggleAdding {
   type: ActorsActionType.TOGGLE_ADDING;
   payload: boolean;
+}
+
+interface ActionAddActor {
+  type: ActorsActionType.ADD_ACTOR;
+  payload: Actor[];
 }
 
 const ACTOR_PLACEHOLDER: Actor = {

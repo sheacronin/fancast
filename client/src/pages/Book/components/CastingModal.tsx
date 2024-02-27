@@ -1,22 +1,17 @@
-import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Modal, ListGroup, Col, Image } from 'react-bootstrap';
 import { InputBar } from '../../../components';
 import type { Actor as IActor } from '../../../types';
-import { API_BASE_URL } from '../../../constants';
+import { useActorSearch } from '../../../hooks/useActorSearch';
 
 interface AddCastModalProps {
   show: boolean;
   hide: () => void;
-  characterId: string;
+  addActor: (actor: IActor) => Promise<void>;
 }
 
-export const CastingModal = ({
-  show,
-  hide,
-  characterId,
-}: AddCastModalProps) => {
-  const [searchResults, setSearchResults] = useState<IActor[]>([]);
+export const CastingModal = ({ show, hide, addActor }: AddCastModalProps) => {
+  const { searchResults, searchActors, clearSearch } = useActorSearch();
 
   return (
     <Modal show={show} onHide={handleHide} backdrop="static">
@@ -25,7 +20,7 @@ export const CastingModal = ({
       </Modal.Header>
       <Modal.Body>
         <InputBar
-          handleSubmit={searchActors}
+          handleSubmit={handleSearchSubmit}
           controlId="actorSearch"
           label="Actor search"
           placeholder="Firstname Lastname"
@@ -33,7 +28,7 @@ export const CastingModal = ({
         {searchResults.length > 0 && (
           <ListGroup variant="flush" className="border rounded-bottom">
             {searchResults.map((actor) => (
-              <Actor actor={actor} addCasting={addCasting} key={actor.id} />
+              <Actor actor={actor} addActor={handleAddActor} key={actor.id} />
             ))}
           </ListGroup>
         )}
@@ -42,45 +37,36 @@ export const CastingModal = ({
     </Modal>
   );
 
-  async function searchActors(e: FormEvent<HTMLFormElement>) {
+  async function handleSearchSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     const { actorSearch } = e.target as typeof e.target & {
       actorSearch: { value: string };
     };
-    const response = await fetch(
-      `${API_BASE_URL}/cast/search/${actorSearch.value}`
-    );
-    const data = await response.json();
-    console.log(data);
-    setSearchResults(data);
+    searchActors(actorSearch.value);
   }
 
-  async function addCasting(actorId: string) {
-    await fetch(`${API_BASE_URL}/characters/${characterId}/addCasting`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(actorId),
-    });
+  async function handleAddActor(actor: IActor) {
+    await addActor(actor);
     handleHide();
   }
 
   function handleHide() {
     hide();
-    setSearchResults([]);
+    clearSearch();
   }
 };
 
 interface ActorProps {
   actor: IActor;
-  addCasting: (actorId: string) => Promise<void>;
+  addActor: (actor: IActor) => Promise<void>;
 }
 
-const Actor = ({ actor, addCasting }: ActorProps) => {
+const Actor = ({ actor, addActor }: ActorProps) => {
   return (
     <ListGroup.Item
       action
-      onClick={() => addCasting(actor.id)}
+      onClick={() => addActor(actor)}
       variant="primary"
       className="d-flex"
     >
