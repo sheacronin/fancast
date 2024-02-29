@@ -5,7 +5,7 @@ using fancast.Models;
 namespace fancast.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api")]
 public class CharactersController : ControllerBase
 {
   private readonly ILogger<CharactersController> _logger;
@@ -17,7 +17,7 @@ public class CharactersController : ControllerBase
 
   static readonly FirestoreDb db = FirestoreDb.Create("fancast-api");
 
-  [HttpGet("{id}")]
+  [HttpGet("[controller]/{id}")]
   public async Task<Character> Get(string id)
   {
     DocumentReference characterRef = db.Collection("characters").Document(id);
@@ -25,7 +25,7 @@ public class CharactersController : ControllerBase
     return characterSnapshot.ConvertTo<Character>();
   }
 
-  [HttpGet("book/{bookId}")]
+  [HttpGet("books/{bookId}/[controller]")]
   public async Task<IEnumerable<Character>> GetByBook(string bookId)
   {
     Query charactersQuery = db.Collection("characters").WhereEqualTo("book_id", bookId);
@@ -33,18 +33,18 @@ public class CharactersController : ControllerBase
     return charactersSnapshot.Select(character => character.ConvertTo<Character>()).ToArray();
   }
 
-  [HttpPut("{id}/addCasting")]
-  public async Task<WriteResult> AddCasting(string id, [FromBody] string actorId)
+  [HttpPatch("[controller]/{id}")]
+  public async Task<WriteResult> AddActor(string id, [FromBody] int actorId)
   {
     DocumentReference characterRef = db.Collection("characters").Document(id);
     DocumentSnapshot characterSnapshot = await characterRef.GetSnapshotAsync();
-    var castIds = characterSnapshot.GetValue<IList<string>>("cast_ids");
-    castIds.Add(actorId);
-    return await characterRef.UpdateAsync("cast_ids", castIds);
+    var actorIds = characterSnapshot.GetValue<IList<int>>("actor_ids");
+    actorIds.Add(actorId);
+    return await characterRef.UpdateAsync("actor_ids", actorIds);
   }
 
-  [HttpPost]
-  public async Task<Character> AddCharacter([FromBody] Character character)
+  [HttpPost("[controller]")]
+  public async Task<Character> Create([FromBody] Character character)
   {
     DocumentReference addedCharacterRef = await db.Collection("characters").AddAsync(character);
     DocumentSnapshot addedCharacter = await addedCharacterRef.GetSnapshotAsync();

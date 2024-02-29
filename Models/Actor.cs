@@ -1,8 +1,8 @@
 namespace fancast.Models;
 
-public class Cast
+public class Actor
 {
-  public required string Id { get; set; }
+  public required int Id { get; set; }
 
   public required string Name { get; set; }
 

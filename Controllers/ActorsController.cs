@@ -1,20 +1,21 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Google.Cloud.Firestore;
-using fancast.Models;
 using TMDbLib.Client;
 using TMDbLib.Objects.People;
 using TMDbLib.Objects.General;
 using TMDbLib.Objects.Search;
+using fancast.Models;
 
 namespace fancast.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
-public class CastController : ControllerBase
+[Route("api")]
+public class ActorsController : ControllerBase
 {
-  private readonly ILogger<CastController> _logger;
+  private readonly ILogger<ActorsController> _logger;
 
-  public CastController(ILogger<CastController> logger)
+  public ActorsController(ILogger<ActorsController> logger)
   {
     _logger = logger;
   }
@@ -23,65 +24,65 @@ public class CastController : ControllerBase
 
   static readonly TMDbClient client = new(Environment.GetEnvironmentVariable("TMDB_API_KEY"));
 
-  [HttpGet("{id}")]
-  public async Task<Cast> Get(int id)
+  [HttpGet("[controller]/{id}")]
+  public async Task<Actor> Get(int id)
   {
     Person person = await client.GetPersonAsync(id);
-    return new Cast()
+    return new Actor()
     {
-      Id = person.Id.ToString(),
+      Id = person.Id,
       Name = person.Name,
       Gender = person.Gender.ToString(),
       ImageLink = person.ProfilePath
     };
   }
 
-  [HttpGet("character/{characterId}")]
-  public async Task<IEnumerable<Cast>> GetCharacterCast(string characterId)
+  [HttpGet("characters/{characterId}/[controller]")]
+  public async Task<IEnumerable<Actor>> GetByCharacter(string characterId)
   {
     DocumentReference characterRef = db.Collection("characters").Document(characterId);
     DocumentSnapshot characterSnapshot = await characterRef.GetSnapshotAsync();
     Character character = characterSnapshot.ConvertTo<Character>();
 
-    // If there are no castings for the character, return an empty array.
-    if (!character.CastIds.Any())
+    // If there are no actors for the character, return an empty array.
+    if (!character.ActorIds.Any())
     {
-      return Array.Empty<Cast>();
+      return Array.Empty<Actor>();
     }
 
-    IList<Cast> castings = new List<Cast>();
-    foreach (string id in character.CastIds)
+    IList<Actor> actors = new List<Actor>();
+    foreach (int id in character.ActorIds)
     {
-      Person person = await client.GetPersonAsync(Int32.Parse(id));
-      Cast casting = new()
+      Person person = await client.GetPersonAsync(id);
+      Actor actor = new()
       {
-        Id = person.Id.ToString(),
+        Id = person.Id,
         Name = person.Name,
         Gender = person.Gender.ToString(),
         ImageLink = person.ProfilePath
       };
-      castings.Add(casting);
+      actors.Add(actor);
     }
-    return castings;
+    return actors;
   }
 
-  [HttpGet("search/{query}")]
-  public async Task<IEnumerable<Cast>> Search(string query)
+  [HttpGet("[controller]")]
+  public async Task<IEnumerable<Actor>> Search([Required] string name)
   {
-    SearchContainer<SearchPerson> results = await client.SearchPersonAsync(query);
-    IList<Cast> people = new List<Cast>();
+    SearchContainer<SearchPerson> results = await client.SearchPersonAsync(name);
+    IList<Actor> actors = new List<Actor>();
     foreach (SearchPerson result in results.Results)
     {
       Person person = await client.GetPersonAsync(result.Id);
-      Cast casting = new()
+      Actor actor = new()
       {
-        Id = person.Id.ToString(),
+        Id = person.Id,
         Name = person.Name,
         Gender = person.Gender.ToString(),
         ImageLink = person.ProfilePath
       };
-      people.Add(casting);
+      actors.Add(actor);
     }
-    return people;
+    return actors;
   }
 }

@@ -50,9 +50,7 @@ export const Home = () => {
     const { search } = e.target as typeof e.target & {
       search: { value: string };
     };
-    const response = await fetch(
-      `${API_BASE_URL}/books/search/${search.value}`
-    );
+    const response = await fetch(`${API_BASE_URL}/books?title=${search.value}`);
     const data = await response.json();
     console.log(data);
     setBooksList(data);

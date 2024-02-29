@@ -13,7 +13,9 @@ export const useCharacters = (bookId: string) => {
 
   const getBookCharacters = useCallback(async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/characters/book/${bookId}`);
+      const response = await fetch(
+        `${API_BASE_URL}/books/${bookId}/characters`
+      );
       const data = await response.json();
       dispatch({ payload: data, type: CharactersActionType.GET_CHARACTERS });
     } catch (error) {

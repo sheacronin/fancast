@@ -32,12 +32,12 @@ export const Character = ({ id, name }: CharacterProps) => {
           if (eventKey) {
             eventKey === 'ADD'
               ? toggleAddingActor(true)
-              : selectActor(eventKey);
+              : selectActor(parseInt(eventKey));
           }
         }}
       >
         <Dropdown.Toggle variant="light">
-          {selectedActor.id === 'PLACEHOLDER' ? (
+          {selectedActor.id === -1 ? (
             <i>No casting selected</i>
           ) : (
             selectedActor.name

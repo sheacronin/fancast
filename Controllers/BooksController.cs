@@ -1,5 +1,5 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OutputCaching;
 using Google.Apis.Books.v1;
 using Google.Apis.Services;
 using static Google.Apis.Books.v1.Data.Volume.VolumeInfoData;
@@ -8,7 +8,7 @@ using fancast.Models;
 namespace fancast.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api")]
 public class BooksController : ControllerBase
 {
   private readonly ILogger<BooksController> _logger;
@@ -47,23 +47,16 @@ public class BooksController : ControllerBase
     return null;
   }
 
-  static BooksService Service
+  static readonly BooksService service = new(new BaseClientService.Initializer
   {
-    get
-    {
-      return new BooksService(new BaseClientService.Initializer
-      {
-        ApplicationName = "Fancast",
-        ApiKey = Environment.GetEnvironmentVariable("GOOGLE_BOOKS_API_KEY")
-      });
-    }
-  }
+    ApplicationName = "Fancast",
+    ApiKey = Environment.GetEnvironmentVariable("GOOGLE_BOOKS_API_KEY")
+  });
 
-  [HttpGet("{id}")]
-  [OutputCache]
+  [HttpGet("[controller]/{id}")]
   public async Task<Book> Get(string id)
   {
-    var result = await Service.Volumes.Get(id).ExecuteAsync();
+    var result = await service.Volumes.Get(id).ExecuteAsync();
     var book = new Book
     {
       Id = result.Id,
@@ -75,11 +68,10 @@ public class BooksController : ControllerBase
     return book;
   }
 
-  [HttpGet("search/{title}")]
-  [OutputCache]
-  public async Task<IList<Book>> SearchByTitle(string title)
+  [HttpGet("[controller]")]
+  public async Task<IList<Book>> Search([Required] string title)
   {
-    var request = Service.Volumes.List($"title={title}");
+    var request = service.Volumes.List($"title={title}");
     request.OrderBy = VolumesResource.ListRequest.OrderByEnum.Relevance;
     request.LangRestrict = "en";
     var result = await request.ExecuteAsync();

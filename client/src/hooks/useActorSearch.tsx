@@ -12,7 +12,7 @@ export const useActorSearch = () => {
 
   const searchActors = async (name: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/cast/search/${name}`);
+      const response = await fetch(`${API_BASE_URL}/actors?name=${name}`);
       const data = await response.json();
       dispatch({ type: ActorSearchActionType.SEARCH_ACTORS, payload: data });
     } catch (error) {

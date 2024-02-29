@@ -18,7 +18,7 @@ export const useActors = (characterId: string) => {
   const getActors = useCallback(async () => {
     try {
       const response = await fetch(
-        `${API_BASE_URL}/cast/character/${characterId}`
+        `${API_BASE_URL}/characters/${characterId}/actors`
       );
       const data = await response.json();
       dispatch({ type: ActorsActionType.GET_ACTORS, payload: data });
@@ -27,7 +27,7 @@ export const useActors = (characterId: string) => {
     }
   }, [characterId]);
 
-  const selectActor = (actorId: string) =>
+  const selectActor = (actorId: number) =>
     dispatch({ type: ActorsActionType.SELECT_ACTOR, payload: actorId });
 
   const toggleAddingActor = (value = !state.addingActor) =>
@@ -38,8 +38,8 @@ export const useActors = (characterId: string) => {
 
   const addActor = async (actor: Actor) => {
     try {
-      await fetch(`${API_BASE_URL}/characters/${characterId}/addCasting`, {
-        method: 'PUT',
+      await fetch(`${API_BASE_URL}/characters/${characterId}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(actor.id),
       });
@@ -68,7 +68,7 @@ export const useActors = (characterId: string) => {
 
 interface ActorsState {
   actors: Actor[];
-  selectedActorId: string | null;
+  selectedActorId: number | null;
   addingActor: boolean;
 }
 
@@ -102,7 +102,7 @@ interface ActionGetActor {
 
 interface ActionSelectActor {
   type: ActorsActionType.SELECT_ACTOR;
-  payload: string;
+  payload: number;
 }
 
 interface ActionToggleAdding {
@@ -116,7 +116,7 @@ interface ActionAddActor {
 }
 
 const ACTOR_PLACEHOLDER: Actor = {
-  id: 'PLACEHOLDER',
+  id: -1,
   name: 'Unknown person',
   gender: 'nonbinary',
   imageLink:

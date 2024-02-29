@@ -4,13 +4,13 @@ import { InputBar } from '../../../components';
 import type { Actor as IActor } from '../../../types';
 import { useActorSearch } from '../../../hooks/useActorSearch';
 
-interface AddCastModalProps {
+interface CastingModalProps {
   show: boolean;
   hide: () => void;
   addActor: (actor: IActor) => Promise<void>;
 }
 
-export const CastingModal = ({ show, hide, addActor }: AddCastModalProps) => {
+export const CastingModal = ({ show, hide, addActor }: CastingModalProps) => {
   const { searchResults, searchActors, clearSearch } = useActorSearch();
 
   return (

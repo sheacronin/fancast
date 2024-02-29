@@ -14,6 +14,6 @@ public class Character
   [FirestoreProperty("book_id")]
   public required string BookId { get; set; }
 
-  [FirestoreProperty("cast_ids")]
-  public required IList<string> CastIds { get; set; }
+  [FirestoreProperty("actor_ids")]
+  public required IList<int> ActorIds { get; set; }
 }

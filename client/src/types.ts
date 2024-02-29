@@ -9,12 +9,12 @@ export interface Book {
 export interface Character {
   id: string;
   name: string;
-  castIds?: string[];
+  actorIds: number[];
   bookId: string;
 }
 
 export interface Actor {
-  id: string;
+  id: number;
   name: string;
   gender: 'male' | 'female' | 'nonbinary';
   imageLink: string;
