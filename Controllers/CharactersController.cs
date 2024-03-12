@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Google.Cloud.Firestore;
 using fancast.Models;
+using fancast.Services.CharactersService;
 
 namespace fancast.Controllers;
 
@@ -8,46 +8,34 @@ namespace fancast.Controllers;
 [Route("api")]
 public class CharactersController : ControllerBase
 {
+  private readonly ICharactersService _charactersService;
   private readonly ILogger<CharactersController> _logger;
 
-  public CharactersController(ILogger<CharactersController> logger)
+  public CharactersController(ILogger<CharactersController> logger, ICharactersService charactersService)
   {
+    _charactersService = charactersService;
     _logger = logger;
   }
 
-  static readonly FirestoreDb db = FirestoreDb.Create("fancast-api");
-
   [HttpGet("[controller]/{id}")]
-  public async Task<Character> Get(string id)
-  {
-    DocumentReference characterRef = db.Collection("characters").Document(id);
-    DocumentSnapshot characterSnapshot = await characterRef.GetSnapshotAsync();
-    return characterSnapshot.ConvertTo<Character>();
-  }
+  public async Task<ActionResult<Character>> Get(string id) =>
+    Ok(await _charactersService.Get(id));
 
   [HttpGet("books/{bookId}/[controller]")]
-  public async Task<IEnumerable<Character>> GetByBook(string bookId)
-  {
-    Query charactersQuery = db.Collection("characters").WhereEqualTo("book_id", bookId);
-    QuerySnapshot charactersSnapshot = await charactersQuery.GetSnapshotAsync();
-    return charactersSnapshot.Select(character => character.ConvertTo<Character>()).ToArray();
-  }
+  public async Task<ActionResult<Character[]>> GetByBook(string bookId) =>
+    Ok(await _charactersService.GetByBook(bookId));
 
   [HttpPatch("[controller]/{id}")]
-  public async Task<WriteResult> AddActor(string id, [FromBody] int actorId)
+  public async Task<ActionResult> AddActor(string id, [FromBody] int actorId)
   {
-    DocumentReference characterRef = db.Collection("characters").Document(id);
-    DocumentSnapshot characterSnapshot = await characterRef.GetSnapshotAsync();
-    var actorIds = characterSnapshot.GetValue<IList<int>>("actor_ids");
-    actorIds.Add(actorId);
-    return await characterRef.UpdateAsync("actor_ids", actorIds);
+    await _charactersService.AddActor(id, actorId);
+    return NoContent();
   }
 
   [HttpPost("[controller]")]
-  public async Task<Character> Create([FromBody] Character character)
+  public async Task<ActionResult<Character>> Create([FromBody] Character character)
   {
-    DocumentReference addedCharacterRef = await db.Collection("characters").AddAsync(character);
-    DocumentSnapshot addedCharacter = await addedCharacterRef.GetSnapshotAsync();
-    return addedCharacter.ConvertTo<Character>();
+    Character newCharacter = await _charactersService.Create(character);
+    return CreatedAtAction(nameof(Get), new { id = newCharacter.Id }, newCharacter);
   }
 }

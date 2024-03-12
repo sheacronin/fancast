@@ -1,4 +1,5 @@
 using fancast.Services.BooksService;
+using fancast.Services.CharactersService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IBooksService, BooksService>();
+builder.Services.AddScoped<ICharactersService, CharactersService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddOutputCache(options =>
