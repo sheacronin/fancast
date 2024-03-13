@@ -15,7 +15,6 @@ public class Book
   }
 
   public string Id { get; set; }
-
   public string Title { get; set; }
   public IList<string> Authors { get; set; }
   public string? ImageLink { get; set; }
