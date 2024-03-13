@@ -20,7 +20,17 @@ export const useActors = (characterId: string) => {
       const response = await fetch(
         `${API_BASE_URL}/characters/${characterId}/actors`
       );
-      const data = await response.json();
+      let data: Actor[];
+      switch (response.status) {
+        case 200:
+          data = await response.json();
+          break;
+        case 204: // No Content
+          data = [];
+          break;
+        default:
+          throw new Error('There was a server issue.');
+      }
       dispatch({ type: ActorsActionType.GET_ACTORS, payload: data });
     } catch (error) {
       console.error(error);

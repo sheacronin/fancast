@@ -11,7 +11,8 @@ interface CastingModalProps {
 }
 
 export const CastingModal = ({ show, hide, addActor }: CastingModalProps) => {
-  const { searchResults, searchActors, clearSearch } = useActorSearch();
+  const { searchResults, hasSearched, searchActors, clearSearch } =
+    useActorSearch();
 
   return (
     <Modal show={show} onHide={handleHide} backdrop="static">
@@ -25,11 +26,15 @@ export const CastingModal = ({ show, hide, addActor }: CastingModalProps) => {
           label="Actor search"
           placeholder="Firstname Lastname"
         />
-        {searchResults.length > 0 && (
+        {hasSearched && (
           <ListGroup variant="flush" className="border rounded-bottom">
-            {searchResults.map((actor) => (
-              <Actor actor={actor} addActor={handleAddActor} key={actor.id} />
-            ))}
+            {searchResults.length > 0 ? (
+              searchResults.map((actor) => (
+                <Actor actor={actor} addActor={handleAddActor} key={actor.id} />
+              ))
+            ) : (
+              <ListGroup.Item>No results found.</ListGroup.Item>
+            )}
           </ListGroup>
         )}
       </Modal.Body>
