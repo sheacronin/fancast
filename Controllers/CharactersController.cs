@@ -18,24 +18,52 @@ public class CharactersController : ControllerBase
   }
 
   [HttpGet("[controller]/{id}")]
-  public async Task<ActionResult<Character>> Get(string id) =>
-    Ok(await _charactersService.Get(id));
+  public async Task<ActionResult<Character>> Get(int id)
+  {
+    Character? character = await _charactersService.Get(id);
+    return character == null ? NotFound() : Ok(character);
+  }
 
   [HttpGet("books/{bookId}/[controller]")]
-  public async Task<ActionResult<Character[]>> GetByBook(string bookId) =>
-    Ok(await _charactersService.GetByBook(bookId));
+  public async Task<ActionResult<Character[]>> GetByBook(string bookId)
+  {
+    Character[] characters = await _charactersService.GetByBook(bookId);
+    return characters.Length == 0 ? NoContent() : Ok(characters);
+  }
 
   [HttpPatch("[controller]/{id}")]
-  public async Task<ActionResult> AddActor(string id, [FromBody] int actorId)
+  public async Task<ActionResult> AddActor(int id, [FromBody] int actorId)
   {
-    await _charactersService.AddActor(id, actorId);
-    return NoContent();
+    try
+    {
+      await _charactersService.AddActor(id, actorId);
+      return NoContent();
+    }
+    catch (Exception e)
+    {
+      if (e.Message == "Character does not exist")
+      {
+        return NotFound();
+      }
+      return BadRequest();
+    }
   }
 
   [HttpPost("[controller]")]
   public async Task<ActionResult<Character>> Create([FromBody] Character character)
   {
-    Character newCharacter = await _charactersService.Create(character);
-    return CreatedAtAction(nameof(Get), new { id = newCharacter.Id }, newCharacter);
+    try
+    {
+      Character newCharacter = await _charactersService.Create(character);
+      return CreatedAtAction(nameof(Get), new { id = newCharacter.Id }, newCharacter);
+    }
+    catch (Exception e)
+    {
+      if (e.Message == "Character with this ID already exists")
+      {
+        return Conflict(e.Message);
+      }
+      throw new HttpRequestException();
+    }
   }
 }

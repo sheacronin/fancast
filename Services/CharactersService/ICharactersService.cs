@@ -4,8 +4,8 @@ namespace fancast.Services.CharactersService;
 
 public interface ICharactersService
 {
-  Task<Character> Get(string id);
+  Task<Character?> Get(int id);
   Task<Character[]> GetByBook(string bookId);
-  Task AddActor(string id, int actorId);
+  Task AddActor(int id, int actorId);
   Task<Character> Create(Character character);
 }

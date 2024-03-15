@@ -22,10 +22,21 @@ public class ActorsController : ControllerBase
   public async Task<ActionResult<Actor>> Get(int id) => Ok(await _actorsService.Get(id));
 
   [HttpGet("characters/{characterId}/[controller]")]
-  public async Task<ActionResult<Actor[]>> GetByCharacter(string characterId)
+  public async Task<ActionResult<Actor[]>> GetByCharacter(int characterId)
   {
-    Actor[] actors = await _actorsService.GetByCharacter(characterId);
-    return actors.Length == 0 ? NoContent() : Ok(actors);
+    try
+    {
+      Actor[] actors = await _actorsService.GetByCharacter(characterId);
+      return actors.Length == 0 ? NoContent() : Ok(actors);
+    }
+    catch (Exception e)
+    {
+      if (e.Message == "The character does not exist")
+      {
+        return BadRequest(e.Message);
+      }
+      throw new HttpRequestException();
+    }
   }
 
   [HttpGet("[controller]")]

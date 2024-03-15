@@ -1,39 +1,45 @@
 using fancast.Models;
-using Google.Cloud.Firestore;
+using fancast.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace fancast.Services.CharactersService;
 
 public class CharactersService : ICharactersService
 {
-  static readonly FirestoreDb db = FirestoreDb.Create("fancast-api");
+  private readonly FancastContext _context;
 
-  public async Task<Character> Get(string id)
+  public CharactersService(FancastContext context)
   {
-    DocumentReference characterRef = db.Collection("characters").Document(id);
-    DocumentSnapshot characterSnapshot = await characterRef.GetSnapshotAsync();
-    return characterSnapshot.ConvertTo<Character>();
+    _context = context;
+  }
+
+  public async Task<Character?> Get(int id)
+  {
+    return await _context.Characters.FirstOrDefaultAsync(c => c.Id == id);
   }
 
   public async Task<Character[]> GetByBook(string bookId)
   {
-    Query charactersQuery = db.Collection("characters").WhereEqualTo("book_id", bookId);
-    QuerySnapshot charactersSnapshot = await charactersQuery.GetSnapshotAsync();
-    return charactersSnapshot.Select(character => character.ConvertTo<Character>()).ToArray();
+    return _context.Characters.Where(c => c.BookId == bookId).ToArray();
   }
 
-  public async Task AddActor(string id, int actorId)
+  public async Task AddActor(int id, int actorId)
   {
-    DocumentReference characterRef = db.Collection("characters").Document(id);
-    DocumentSnapshot characterSnapshot = await characterRef.GetSnapshotAsync();
-    var actorIds = characterSnapshot.GetValue<IList<int>>("actor_ids");
+    Character character = _context.Characters.Find(id) ?? throw new InvalidOperationException("Character does not exist");
+    var actorIds = character.ActorIds.ToList();
     actorIds.Add(actorId);
-    await characterRef.UpdateAsync("actor_ids", actorIds);
+    character.ActorIds = actorIds.ToArray();
+    _context.SaveChanges();
   }
 
   public async Task<Character> Create(Character character)
   {
-    DocumentReference newCharacterRef = await db.Collection("characters").AddAsync(character);
-    DocumentSnapshot newCharacterSnapshot = await newCharacterRef.GetSnapshotAsync();
-    return newCharacterSnapshot.ConvertTo<Character>();
+    if (_context.Characters.Any(c => c.Id == character.Id))
+    {
+      throw new InvalidOperationException("Character with this ID already exists");
+    }
+    _context.Characters.Add(character);
+    _context.SaveChanges();
+    return character;
   }
 }
