@@ -57,7 +57,6 @@ export const CharactersSection = ({ bookId }: CharacterProps) => {
     };
 
     const character = {
-      id: '',
       name: characterName.value,
       actorIds: [],
       bookId,

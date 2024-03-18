@@ -23,7 +23,7 @@ export const useCharacters = (bookId: string) => {
     }
   }, [bookId]);
 
-  const addCharacter = async (character: Character) => {
+  const addCharacter = async (character: Omit<Character, 'id'>) => {
     try {
       const response = await fetch(`${API_BASE_URL}/characters`, {
         method: 'POST',

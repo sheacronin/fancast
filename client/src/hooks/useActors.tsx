@@ -9,7 +9,7 @@ enum ActorsActionType {
   ADD_ACTOR = 'ADD_ACTOR',
 }
 
-export const useActors = (characterId: string) => {
+export const useActors = (characterId: number) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const selectedActor =
     state.actors.find((actor) => actor.id === state.selectedActorId) ||

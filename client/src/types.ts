@@ -7,7 +7,7 @@ export interface Book {
 }
 
 export interface Character {
-  id: string;
+  id: number;
   name: string;
   actorIds: number[];
   bookId: string;

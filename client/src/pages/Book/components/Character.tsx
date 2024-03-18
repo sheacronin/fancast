@@ -3,7 +3,7 @@ import { CastingModal } from './CastingModal';
 import { useActors } from '../../../hooks/useActors';
 
 interface CharacterProps {
-  id: string;
+  id: number;
   name: string;
 }
 
