@@ -17,7 +17,7 @@ export const useCharacters = (bookId: string) => {
         `${API_BASE_URL}/books/${bookId}/characters`
       );
       const data = await response.json();
-      dispatch({ payload: data, type: CharactersActionType.GET_CHARACTERS });
+      dispatch({ type: CharactersActionType.GET_CHARACTERS, payload: data });
     } catch (error) {
       console.error(error);
     }
@@ -32,8 +32,11 @@ export const useCharacters = (bookId: string) => {
       });
       const newCharacter = await response.json();
       dispatch({
-        payload: [...state.characters, newCharacter],
         type: CharactersActionType.ADD_CHARACTER,
+        // Sort updated characters alphabetically by name
+        payload: [...state.characters, newCharacter].sort((charA, charB) =>
+          charA.name > charB.name ? 1 : -1
+        ),
       });
     } catch (error) {
       console.error(error);
@@ -42,8 +45,8 @@ export const useCharacters = (bookId: string) => {
 
   const toggleAddingCharacter = () =>
     dispatch({
-      payload: !state.addingCharacter,
       type: CharactersActionType.TOGGLE_ADDING,
+      payload: !state.addingCharacter,
     });
 
   useEffect(() => {

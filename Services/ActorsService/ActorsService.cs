@@ -45,7 +45,7 @@ public class ActorsService : IActorsService
       Actor actor = new(person);
       actors.Add(actor);
     }
-    return actors.ToArray();
+    return actors.OrderBy(a => a.Name).ToArray();
   }
 
   public async Task<Actor[]> Search(string name)

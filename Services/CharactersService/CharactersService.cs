@@ -20,7 +20,7 @@ public class CharactersService : ICharactersService
 
   public async Task<Character[]> GetByBook(string bookId)
   {
-    return _context.Characters.Where(c => c.BookId == bookId).ToArray();
+    return _context.Characters.Where(c => c.BookId == bookId).OrderBy(c => c.Name).ToArray();
   }
 
   public async Task AddActor(int id, int actorId)

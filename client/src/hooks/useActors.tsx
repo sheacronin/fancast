@@ -55,7 +55,10 @@ export const useActors = (characterId: number) => {
       });
       dispatch({
         type: ActorsActionType.ADD_ACTOR,
-        payload: [...state.actors, actor],
+        // Sort updated actors alphabetically by name
+        payload: [...state.actors, actor].sort((actorA, actorB) =>
+          actorA.name > actorB.name ? 1 : -1
+        ),
       });
       selectActor(actor.id);
     } catch (error) {
