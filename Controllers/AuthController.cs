@@ -22,6 +22,7 @@ public class AuthController : ControllerBase
   [HttpPost("register")]
   public ActionResult<User> Register(UserDto userDto)
   {
+    // TODO: prevent username duplicates
     string passwordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
 
     User user = new()

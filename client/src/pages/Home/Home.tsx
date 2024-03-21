@@ -52,7 +52,6 @@ export const Home = () => {
     };
     const response = await fetch(`${API_BASE_URL}/books?title=${search.value}`);
     const data = await response.json();
-    console.log(data);
     setBooksList(data);
   }
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import { Home, Book } from './pages';
+import { Home, Book, Register } from './pages';
 import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -19,9 +19,13 @@ const router = createBrowserRouter([
         path: '/books/:id',
         element: <Book />,
       },
+      {
+        path: '/register',
+        element: <Register />,
+      },
     ],
-    // TODO: errorElement: <Error />
   },
+  // TODO: errorElement: <Error />
 ]);
 
 const root = ReactDOM.createRoot(
