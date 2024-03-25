@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using System.IdentityModel.Tokens.Jwt;
 using fancast.Models;
 using fancast.Data;
@@ -23,6 +24,7 @@ public class AuthController : ControllerBase
   public ActionResult<User> Register(UserDto userDto)
   {
     // TODO: prevent username duplicates
+    // TODO: confirm password
     string passwordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
 
     User user = new()
@@ -38,23 +40,23 @@ public class AuthController : ControllerBase
   }
 
   [HttpPost("login")]
-  public ActionResult<User> Login(UserDto userDto)
+  public ActionResult<string> Login(UserDto userDto)
   {
     User? user = _context.Users.SingleOrDefault(u => u.Username == userDto.Username);
 
     if (user == null)
     {
-      return BadRequest("User not found");
+      return BadRequest(JsonSerializer.Serialize("User not found"));
     }
 
     if (!BCrypt.Net.BCrypt.Verify(userDto.Password, user.PasswordHash))
     {
-      return BadRequest("Wrong password.");
+      return BadRequest(JsonSerializer.Serialize("Wrong password."));
     }
 
     string token = CreateToken(user);
 
-    return Ok(token);
+    return Ok(JsonSerializer.Serialize(token));
   }
 
   private static string CreateToken(User user)
