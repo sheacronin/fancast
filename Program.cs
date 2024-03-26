@@ -1,14 +1,43 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using fancast.Services.BooksService;
 using fancast.Services.CharactersService;
 using fancast.Services.ActorsService;
 using fancast.Data;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                Environment.GetEnvironmentVariable("SECRET_KEY")!)),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                context.Token = context.Request.Cookies["token"];
+                return Task.CompletedTask;
+            }
+        };
+    }).AddCookie(options =>
+    {
+        options.Cookie.Name = "token";
+        options.ExpireTimeSpan = TimeSpan.FromDays(1);
+    });
 builder.Services.AddScoped<IBooksService, BooksService>();
 builder.Services.AddScoped<ICharactersService, CharactersService>();
 builder.Services.AddScoped<IActorsService, ActorsService>();
@@ -43,6 +72,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 // app.UseOutputCache();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "api",

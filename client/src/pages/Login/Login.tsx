@@ -28,7 +28,6 @@ export const Login = () => {
       }),
     });
     // TODO: handle bad requests
-    const data = await response.json();
-    console.log(data);
+    console.log(response);
   }
 };

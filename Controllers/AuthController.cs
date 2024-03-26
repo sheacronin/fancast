@@ -40,7 +40,7 @@ public class AuthController : ControllerBase
   }
 
   [HttpPost("login")]
-  public ActionResult<string> Login(UserDto userDto)
+  public ActionResult Login(UserDto userDto)
   {
     User? user = _context.Users.SingleOrDefault(u => u.Username == userDto.Username);
 
@@ -56,14 +56,22 @@ public class AuthController : ControllerBase
 
     string token = CreateToken(user);
 
-    return Ok(JsonSerializer.Serialize(token));
+    HttpContext.Response.Cookies.Append("token", token,
+      new CookieOptions
+      {
+        Expires = DateTime.Now.AddDays(1),
+        HttpOnly = true
+      });
+
+    return Ok();
   }
 
   private static string CreateToken(User user)
   {
     List<Claim> claims = new()
     {
-      new(ClaimTypes.Name, user.Username)
+      new(ClaimTypes.Name, user.Username),
+      new("Id", user.Id.ToString()),
     };
 
     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
