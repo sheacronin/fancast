@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
@@ -18,6 +19,18 @@ public class AuthController : ControllerBase
   public AuthController(FancastContext context)
   {
     _context = context;
+  }
+
+  [Authorize]
+  [HttpGet("current-user")]
+  public ActionResult<User> GetCurrentUser()
+  {
+    var token = Request.Cookies["token"];
+    var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
+    string id = jwt.Claims.First(claim => claim.Type == "Id").Value;
+    var user = _context.Users.Find(int.Parse(id));
+
+    return Ok(user);
   }
 
   [HttpPost("register")]
@@ -40,7 +53,7 @@ public class AuthController : ControllerBase
   }
 
   [HttpPost("login")]
-  public ActionResult Login(UserDto userDto)
+  public ActionResult<User> Login(UserDto userDto)
   {
     User? user = _context.Users.SingleOrDefault(u => u.Username == userDto.Username);
 
@@ -63,7 +76,7 @@ public class AuthController : ControllerBase
         HttpOnly = true
       });
 
-    return Ok();
+    return Ok(user);
   }
 
   private static string CreateToken(User user)

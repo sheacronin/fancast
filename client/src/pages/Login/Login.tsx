@@ -1,9 +1,12 @@
 import { Row, Col } from 'react-bootstrap';
 import { AuthForm } from '../../components';
 import { API_BASE_URL } from '../../constants';
+import { useAuthDispatch } from '../../context';
 import type { FormEvent } from 'react';
 
 export const Login = () => {
+  const { login } = useAuthDispatch();
+
   return (
     <Row className="justify-content-center">
       <Col xs={10} sm={8} md={6} lg={4}>
@@ -28,6 +31,7 @@ export const Login = () => {
       }),
     });
     // TODO: handle bad requests
-    console.log(response);
+    const user = await response.json();
+    login(user);
   }
 };
