@@ -64,10 +64,43 @@ export function useAuth() {
 export function useAuthDispatch() {
   const dispatch = useContext(AuthDispatchContext);
 
-  const login = (user: User) => dispatch({ type: 'login', payload: user });
-  const logout = () => dispatch({ type: 'logout' });
+  const login = async (username: string, password: string) => {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+    });
+    // TODO: handle bad requests
+    const user = await response.json();
+    dispatch({ type: 'login', payload: user });
+  };
 
-  return { login, logout };
+  const logout = async () => {
+    await fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST' });
+    dispatch({ type: 'logout' });
+  };
+
+  const register = async (
+    username: string,
+    password: string,
+    confirmPassword: string
+  ) => {
+    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username,
+        password,
+        confirmPassword,
+      }),
+    });
+    // TODO: handle bad requests
+  };
+
+  return { login, logout, register };
 }
 
 function authReducer(authInfo: AuthInfo, action: AuthDispatchAction) {

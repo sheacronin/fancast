@@ -79,6 +79,14 @@ public class AuthController : ControllerBase
     return Ok(user);
   }
 
+  [HttpPost("logout")]
+  public ActionResult Logout()
+  {
+    HttpContext.Response.Cookies.Delete("token");
+
+    return Ok();
+  }
+
   private static string CreateToken(User user)
   {
     List<Claim> claims = new()

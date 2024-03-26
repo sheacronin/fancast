@@ -1,6 +1,5 @@
 import { Row, Col } from 'react-bootstrap';
 import { AuthForm } from '../../components';
-import { API_BASE_URL } from '../../constants';
 import { useAuthDispatch } from '../../context';
 import type { FormEvent } from 'react';
 
@@ -22,16 +21,7 @@ export const Login = () => {
       username: { value: string };
       password: { value: string };
     };
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: username.value,
-        password: password.value,
-      }),
-    });
-    // TODO: handle bad requests
-    const user = await response.json();
-    login(user);
+
+    login(username.value, password.value);
   }
 };
