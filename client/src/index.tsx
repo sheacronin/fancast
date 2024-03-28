@@ -2,18 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { Home, Book, Register, Login } from './pages';
-import { AuthProvider } from './context';
+import { AuthProvider, UnauthenticatedRoute, userLoader } from './context';
 import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const router = createBrowserRouter([
   {
-    path: '/',
+    loader: userLoader,
     element: <AuthProvider />,
     children: [
       {
-        path: '/',
         element: <App />,
         children: [
           {
@@ -21,16 +20,21 @@ const router = createBrowserRouter([
             element: <Home />,
           },
           {
-            path: '/books/:id',
+            path: 'books/:id',
             element: <Book />,
           },
           {
-            path: '/register',
-            element: <Register />,
-          },
-          {
-            path: '/login',
-            element: <Login />,
+            element: <UnauthenticatedRoute />,
+            children: [
+              {
+                path: 'register',
+                element: <Register />,
+              },
+              {
+                path: 'login',
+                element: <Login />,
+              },
+            ],
           },
         ],
       },

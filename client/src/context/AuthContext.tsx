@@ -1,6 +1,12 @@
 import { createContext, useReducer, useContext, useEffect } from 'react';
 import { API_BASE_URL } from '../constants';
-import { Outlet, useLocation } from 'react-router-dom';
+import {
+  Outlet,
+  useLocation,
+  useNavigate,
+  Navigate,
+  useLoaderData,
+} from 'react-router-dom';
 import type { Dispatch } from 'react';
 
 export const AuthContext = createContext<AuthInfo>({ user: null, error: '' });
@@ -45,36 +51,20 @@ interface ActionClearError {
   type: AuthActionType.CLEAR_ERROR;
 }
 
-export function AuthProvider() {
+export const AuthProvider = () => {
+  const user = useLoaderData() as User;
   const [authInfo, dispatch] = useReducer(authReducer, {
-    user: null,
+    user,
     error: '',
   });
   const location = useLocation();
 
-  useEffect(() => {
-    fetchCurrentUser().then((user) =>
-      dispatch({ type: AuthActionType.LOGIN, payload: user })
-    );
-
-    async function fetchCurrentUser() {
-      const response = await fetch(`${API_BASE_URL}/auth/current-user`, {
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        return await response.json();
-      }
-
-      // If the response isn't OK, return null user
-      return null;
-    }
-  }, []);
-
   // Clear errors when user navigates to different page
   useEffect(() => {
-    dispatch({ type: AuthActionType.CLEAR_ERROR });
+    if (authInfo.error) {
+      dispatch({ type: AuthActionType.CLEAR_ERROR });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
   return (
@@ -84,14 +74,36 @@ export function AuthProvider() {
       </AuthDispatchContext.Provider>
     </AuthContext.Provider>
   );
-}
+};
 
-export function useAuth() {
+export const userLoader = async () => {
+  const response = await fetch(`${API_BASE_URL}/auth/current-user`, {
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+  });
+
+  if (response.ok) {
+    return await response.json();
+  }
+
+  // If the response isn't OK, return null user
+  return null;
+};
+
+export const UnauthenticatedRoute = () => {
+  const { user } = useAuth();
+
+  // Only allow access to this route if no logged in user
+  return user === null ? <Outlet /> : <Navigate to="/" />;
+};
+
+export const useAuth = () => {
   return useContext(AuthContext);
-}
+};
 
-export function useAuthDispatch() {
+export const useAuthDispatch = () => {
   const dispatch = useContext(AuthDispatchContext);
+  const navigate = useNavigate();
 
   const login = async (username: string, password: string) => {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -106,7 +118,7 @@ export function useAuthDispatch() {
     if (response.ok) {
       const user = await response.json();
       dispatch({ type: AuthActionType.LOGIN, payload: user });
-      dispatch({ type: AuthActionType.CLEAR_ERROR });
+      navigate('/', { replace: true });
     } else {
       const error = await response.json();
       dispatch({ type: AuthActionType.ERROR, payload: error });
@@ -116,6 +128,7 @@ export function useAuthDispatch() {
   const logout = async () => {
     await fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST' });
     dispatch({ type: AuthActionType.LOGOUT });
+    navigate('/');
   };
 
   const register = async (
@@ -133,18 +146,18 @@ export function useAuthDispatch() {
       }),
     });
 
-    if (!response.ok) {
+    if (response.ok) {
+      navigate('/login');
+    } else {
       const error = await response.json();
       dispatch({ type: AuthActionType.ERROR, payload: error });
-    } else {
-      dispatch({ type: AuthActionType.CLEAR_ERROR });
     }
   };
 
   return { login, logout, register };
-}
+};
 
-function authReducer(authInfo: AuthInfo, action: AuthAction) {
+const authReducer = (authInfo: AuthInfo, action: AuthAction) => {
   switch (action.type) {
     case AuthActionType.LOGIN:
       return { ...authInfo, user: action.payload || null };
@@ -157,4 +170,4 @@ function authReducer(authInfo: AuthInfo, action: AuthAction) {
     default:
       return authInfo;
   }
-}
+};
