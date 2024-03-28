@@ -36,8 +36,12 @@ public class AuthController : ControllerBase
   [HttpPost("register")]
   public ActionResult<User> Register(UserDto userDto)
   {
-    // TODO: prevent username duplicates
-    // TODO: confirm password
+    string error = ValidateRegistration(userDto);
+    if (error != string.Empty)
+    {
+      return BadRequest(error);
+    }
+
     string passwordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
 
     User user = new()
@@ -57,17 +61,13 @@ public class AuthController : ControllerBase
   {
     User? user = _context.Users.SingleOrDefault(u => u.Username == userDto.Username);
 
-    if (user == null)
+    string error = ValidateLogin(userDto, user);
+    if (error != string.Empty)
     {
-      return BadRequest(JsonSerializer.Serialize("User not found"));
+      return BadRequest(error);
     }
 
-    if (!BCrypt.Net.BCrypt.Verify(userDto.Password, user.PasswordHash))
-    {
-      return BadRequest(JsonSerializer.Serialize("Wrong password."));
-    }
-
-    string token = CreateToken(user);
+    string token = CreateToken(user!);
 
     HttpContext.Response.Cookies.Append("token", token,
       new CookieOptions
@@ -85,6 +85,63 @@ public class AuthController : ControllerBase
     HttpContext.Response.Cookies.Delete("token");
 
     return Ok();
+  }
+
+  private string ValidateRegistration(UserDto userDto)
+  {
+    string emptyError = ValidateNotEmpty(userDto);
+    if (emptyError != string.Empty)
+    {
+      return emptyError;
+    }
+
+    if (_context.Users.Any(u => u.Username == userDto.Username))
+    {
+      return JsonSerializer.Serialize("Username is taken.");
+    }
+
+    if (userDto.Password != userDto.ConfirmPassword)
+    {
+      return JsonSerializer.Serialize("Passwords do not match.");
+    }
+
+    return string.Empty;
+  }
+
+  private static string ValidateLogin(UserDto userDto, User? user)
+  {
+    string emptyError = ValidateNotEmpty(userDto);
+    if (emptyError != string.Empty)
+    {
+      return emptyError;
+    }
+
+    if (user == null)
+    {
+      return JsonSerializer.Serialize("User not found.");
+    }
+
+    if (!BCrypt.Net.BCrypt.Verify(userDto.Password, user.PasswordHash))
+    {
+      return JsonSerializer.Serialize("Wrong password.");
+    }
+
+    return string.Empty;
+  }
+
+  private static string ValidateNotEmpty(UserDto userDto)
+  {
+    if (userDto.Username == string.Empty)
+    {
+      return JsonSerializer.Serialize("Username must not be empty.");
+    }
+
+    if (userDto.Password == string.Empty)
+    {
+      return JsonSerializer.Serialize("Password must not be empty.");
+    }
+
+    return string.Empty;
   }
 
   private static string CreateToken(User user)

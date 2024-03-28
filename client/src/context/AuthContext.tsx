@@ -1,14 +1,16 @@
 import { createContext, useReducer, useContext, useEffect } from 'react';
 import { API_BASE_URL } from '../constants';
-import type { ReactNode, Dispatch } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
+import type { Dispatch } from 'react';
 
-export const AuthContext = createContext<AuthInfo>({ user: null });
-export const AuthDispatchContext = createContext<Dispatch<AuthDispatchAction>>(
+export const AuthContext = createContext<AuthInfo>({ user: null, error: '' });
+export const AuthDispatchContext = createContext<Dispatch<AuthAction>>(
   () => null
 );
 
 interface AuthInfo {
   user: User | null;
+  error: string;
 }
 
 interface User {
@@ -16,21 +18,43 @@ interface User {
   username: string;
 }
 
-interface AuthDispatchAction {
-  type: 'login' | 'logout';
-  payload?: User;
+enum AuthActionType {
+  LOGIN = 'LOGIN',
+  LOGOUT = 'LOGOUT',
+  ERROR = 'ERROR',
+  CLEAR_ERROR = 'CLEAR_ERROR',
 }
 
-interface AuthProviderProps {
-  children: ReactNode;
+type AuthAction = ActionLogin | ActionLogout | ActionError | ActionClearError;
+
+interface ActionLogin {
+  type: AuthActionType.LOGIN;
+  payload: User;
 }
 
-export function AuthProvider({ children }: AuthProviderProps) {
-  const [authInfo, dispatch] = useReducer(authReducer, { user: null });
+interface ActionLogout {
+  type: AuthActionType.LOGOUT;
+}
+
+interface ActionError {
+  type: AuthActionType.ERROR;
+  payload: string;
+}
+
+interface ActionClearError {
+  type: AuthActionType.CLEAR_ERROR;
+}
+
+export function AuthProvider() {
+  const [authInfo, dispatch] = useReducer(authReducer, {
+    user: null,
+    error: '',
+  });
+  const location = useLocation();
 
   useEffect(() => {
     fetchCurrentUser().then((user) =>
-      dispatch({ type: 'login', payload: user })
+      dispatch({ type: AuthActionType.LOGIN, payload: user })
     );
 
     async function fetchCurrentUser() {
@@ -39,7 +63,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         credentials: 'include',
       });
 
-      if (response.status === 200) {
+      if (response.ok) {
         return await response.json();
       }
 
@@ -48,10 +72,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, []);
 
+  // Clear errors when user navigates to different page
+  useEffect(() => {
+    dispatch({ type: AuthActionType.CLEAR_ERROR });
+  }, [location]);
+
   return (
     <AuthContext.Provider value={authInfo}>
       <AuthDispatchContext.Provider value={dispatch}>
-        {children}
+        <Outlet />
       </AuthDispatchContext.Provider>
     </AuthContext.Provider>
   );
@@ -73,14 +102,20 @@ export function useAuthDispatch() {
         password,
       }),
     });
-    // TODO: handle bad requests
-    const user = await response.json();
-    dispatch({ type: 'login', payload: user });
+
+    if (response.ok) {
+      const user = await response.json();
+      dispatch({ type: AuthActionType.LOGIN, payload: user });
+      dispatch({ type: AuthActionType.CLEAR_ERROR });
+    } else {
+      const error = await response.json();
+      dispatch({ type: AuthActionType.ERROR, payload: error });
+    }
   };
 
   const logout = async () => {
     await fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST' });
-    dispatch({ type: 'logout' });
+    dispatch({ type: AuthActionType.LOGOUT });
   };
 
   const register = async (
@@ -97,17 +132,29 @@ export function useAuthDispatch() {
         confirmPassword,
       }),
     });
-    // TODO: handle bad requests
+
+    if (!response.ok) {
+      const error = await response.json();
+      dispatch({ type: AuthActionType.ERROR, payload: error });
+    } else {
+      dispatch({ type: AuthActionType.CLEAR_ERROR });
+    }
   };
 
   return { login, logout, register };
 }
 
-function authReducer(authInfo: AuthInfo, action: AuthDispatchAction) {
+function authReducer(authInfo: AuthInfo, action: AuthAction) {
   switch (action.type) {
-    case 'login':
-      return { user: action.payload || null };
-    case 'logout':
-      return { user: null };
+    case AuthActionType.LOGIN:
+      return { ...authInfo, user: action.payload || null };
+    case AuthActionType.LOGOUT:
+      return { ...authInfo, user: null };
+    case AuthActionType.ERROR:
+      return { ...authInfo, error: action.payload };
+    case AuthActionType.CLEAR_ERROR:
+      return { ...authInfo, error: '' };
+    default:
+      return authInfo;
   }
 }

@@ -56,7 +56,7 @@ export const useCharacters = (bookId: string) => {
   return { ...state, addCharacter, toggleAddingCharacter };
 };
 
-const reducer = (state: CharactersState, action: CharactersActions) => {
+const reducer = (state: CharactersState, action: CharactersAction) => {
   switch (action.type) {
     case CharactersActionType.GET_CHARACTERS:
       return { ...state, characters: action.payload };
@@ -76,7 +76,7 @@ interface CharactersState {
   addingCharacter: boolean;
 }
 
-type CharactersActions =
+type CharactersAction =
   | ActionGetCharacters
   | ActionAddCharacter
   | ActionToggleAdding;

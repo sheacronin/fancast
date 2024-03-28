@@ -1,5 +1,6 @@
 import { Form, Button } from 'react-bootstrap';
 import type { FormEventHandler } from 'react';
+import { useAuth } from '../context';
 
 interface AuthFormProps {
   formTitle: string;
@@ -12,9 +13,12 @@ export const AuthForm = ({
   handleSubmit,
   confirmPassword = false,
 }: AuthFormProps) => {
+  const { error } = useAuth();
+
   return (
-    <Form onSubmit={handleSubmit} className="bg-dark text-light p-3 rounded">
+    <Form onSubmit={handleSubmit} className="bg-dark text-light p-4 rounded">
       <h2 className="h4">{formTitle}</h2>
+      {error && <p className="text-danger">{error}</p>}
       <Form.Group controlId="username" className="mb-3">
         <Form.Label>Username</Form.Label>
         <Form.Control placeholder="Enter username" />

@@ -10,23 +10,29 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <App />,
+    element: <AuthProvider />,
     children: [
       {
         path: '/',
-        element: <Home />,
-      },
-      {
-        path: '/books/:id',
-        element: <Book />,
-      },
-      {
-        path: '/register',
-        element: <Register />,
-      },
-      {
-        path: '/login',
-        element: <Login />,
+        element: <App />,
+        children: [
+          {
+            path: '/',
+            element: <Home />,
+          },
+          {
+            path: '/books/:id',
+            element: <Book />,
+          },
+          {
+            path: '/register',
+            element: <Register />,
+          },
+          {
+            path: '/login',
+            element: <Login />,
+          },
+        ],
       },
     ],
   },
@@ -38,9 +44,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <RouterProvider router={router} />
   </React.StrictMode>
 );
 
