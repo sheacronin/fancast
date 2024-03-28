@@ -1,7 +1,7 @@
-import type { FormEvent } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { AuthForm } from '../../components';
 import { useAuthDispatch } from '../../context';
+import type { AuthInputs } from '../../components';
 
 export const Register = () => {
   const { register } = useAuthDispatch();
@@ -11,23 +11,15 @@ export const Register = () => {
       <Col xs={10} sm={8} md={6} lg={4}>
         <AuthForm
           formTitle="Create an account"
-          handleSubmit={handleRegistration}
+          onSubmit={handleRegistration}
           confirmPassword
         />
       </Col>
     </Row>
   );
 
-  async function handleRegistration(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    const { username, password, confirmPassword } =
-      e.target as typeof e.target & {
-        username: { value: string };
-        password: { value: string };
-        confirmPassword: { value: string };
-      };
-
-    register(username.value, password.value, confirmPassword.value);
+  async function handleRegistration(inputs: AuthInputs) {
+    const { username, password, confirmPassword } = inputs;
+    register(username, password, confirmPassword!);
   }
 };
