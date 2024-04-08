@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using fancast.Services.BooksService;
 using fancast.Services.CharactersService;
 using fancast.Services.ActorsService;
+using fancast.Services.AuthService;
 using fancast.Data;
 using System.Text;
 
@@ -41,6 +42,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddScoped<IBooksService, BooksService>();
 builder.Services.AddScoped<ICharactersService, CharactersService>();
 builder.Services.AddScoped<IActorsService, ActorsService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddDbContext<FancastContext>(options =>
     options.UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")));
 builder.Services.AddEndpointsApiExplorer();
