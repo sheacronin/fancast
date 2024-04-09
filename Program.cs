@@ -4,15 +4,21 @@ using Microsoft.IdentityModel.Tokens;
 using fancast.Services.BooksService;
 using fancast.Services.CharactersService;
 using fancast.Services.ActorsService;
+using fancast.Services.CastingsService;
 using fancast.Services.AuthService;
 using fancast.Data;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -43,6 +49,7 @@ builder.Services.AddScoped<IBooksService, BooksService>();
 builder.Services.AddScoped<ICharactersService, CharactersService>();
 builder.Services.AddScoped<IActorsService, ActorsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICastingsService, CastingsService>();
 builder.Services.AddDbContext<FancastContext>(options =>
     options.UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")));
 builder.Services.AddEndpointsApiExplorer();

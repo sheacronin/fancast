@@ -13,9 +13,9 @@ public static class DbInitializer
 
     var characters = new Character[]
     {
-      new() { Name = "David", BookId = "0OBAjgEACAAJ", ActorIds = Array.Empty<int>() },
-      new() { Name = "Giovanni", BookId = "0OBAjgEACAAJ", ActorIds = new int[] { 54815 } },
-      new() { Name = "Hella", BookId = "0OBAjgEACAAJ", ActorIds = Array.Empty<int>() }
+      new() { Name = "David", BookId = "0OBAjgEACAAJ" },
+      new() { Name = "Giovanni", BookId = "0OBAjgEACAAJ" },
+      new() { Name = "Hella", BookId = "0OBAjgEACAAJ" }
     };
 
     context.Characters.AddRange(characters);

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using fancast.Data;
@@ -11,9 +12,11 @@ using fancast.Data;
 namespace fancast.Migrations
 {
     [DbContext(typeof(FancastContext))]
-    partial class FancastContextModelSnapshot : ModelSnapshot
+    [Migration("20240409154214_CastingsTable")]
+    partial class CastingsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

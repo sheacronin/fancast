@@ -31,24 +31,6 @@ public class CharactersController : ControllerBase
     return characters.Length == 0 ? NoContent() : Ok(characters);
   }
 
-  [HttpPatch("[controller]/{id}")]
-  public async Task<ActionResult> AddActor(int id, [FromBody] int actorId)
-  {
-    try
-    {
-      await _charactersService.AddActor(id, actorId);
-      return NoContent();
-    }
-    catch (Exception e)
-    {
-      if (e.Message == "Character does not exist")
-      {
-        return NotFound();
-      }
-      return BadRequest();
-    }
-  }
-
   [HttpPost("[controller]")]
   public async Task<ActionResult<Character>> Create([FromBody] Character character)
   {

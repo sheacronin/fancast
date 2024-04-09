@@ -13,23 +13,12 @@ public class CharactersService : ICharactersService
     _context = context;
   }
 
-  public async Task<Character?> Get(int id)
-  {
-    return await _context.Characters.FirstOrDefaultAsync(c => c.Id == id);
-  }
+  public async Task<Character?> Get(int id) =>
+    await _context.Characters.Include(c => c.Castings).FirstOrDefaultAsync(c => c.Id == id);
 
   public async Task<Character[]> GetByBook(string bookId)
   {
     return _context.Characters.Where(c => c.BookId == bookId).OrderBy(c => c.Name).ToArray();
-  }
-
-  public async Task AddActor(int id, int actorId)
-  {
-    Character character = _context.Characters.Find(id) ?? throw new InvalidOperationException("Character does not exist");
-    var actorIds = character.ActorIds.ToList();
-    actorIds.Add(actorId);
-    character.ActorIds = actorIds.ToArray();
-    _context.SaveChanges();
   }
 
   public async Task<Character> Create(Character character)
