@@ -21,6 +21,7 @@ public class CastingsService : ICastingsService
 
   public async Task<Casting[]> Search(int? characterId = null, int? actorId = null) =>
     await _context.Castings
+      .Include(c => c.Users)
       .Where(c => c.CharacterId == characterId || c.ActorId == actorId)
       .ToArrayAsync();
 

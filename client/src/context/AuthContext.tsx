@@ -8,6 +8,7 @@ import {
   useLoaderData,
 } from 'react-router-dom';
 import type { Dispatch } from 'react';
+import type { User } from '../types';
 
 export const AuthContext = createContext<AuthInfo>({ user: null, error: '' });
 export const AuthDispatchContext = createContext<Dispatch<AuthAction>>(
@@ -17,11 +18,6 @@ export const AuthDispatchContext = createContext<Dispatch<AuthAction>>(
 interface AuthInfo {
   user: User | null;
   error: string;
-}
-
-interface User {
-  id: number;
-  username: string;
 }
 
 enum AuthActionType {

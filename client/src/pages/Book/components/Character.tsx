@@ -1,6 +1,7 @@
 import { Col, Image, Dropdown } from 'react-bootstrap';
 import { CastingModal } from './CastingModal';
-import { useActors } from '../../../hooks/useActors';
+import { useCastings } from '../../../hooks/useCastings';
+import { useAuth } from '../../../context';
 
 interface CharacterProps {
   id: number;
@@ -8,21 +9,23 @@ interface CharacterProps {
 }
 
 export const Character = ({ id, name }: CharacterProps) => {
+  const { user } = useAuth();
   const {
-    actors,
-    selectedActor,
-    addingActor,
-    selectActor,
-    toggleAddingActor,
-    addActor,
-  } = useActors(id);
+    castings,
+    selectedCasting,
+    addingCasting,
+    selectCasting,
+    toggleAddingCasting,
+    addCasting,
+  } = useCastings(id, user && user.id);
+  console.log(selectedCasting);
 
   return (
     <Col xs={12} md={6} lg={4} className="p-3">
       <p>{name}</p>
       <Image
-        src={selectedActor.imageLink}
-        alt={selectedActor.name}
+        src={selectedCasting.actor.imageLink}
+        alt={selectedCasting.actor.name}
         className="w-50"
         rounded
       />
@@ -31,22 +34,22 @@ export const Character = ({ id, name }: CharacterProps) => {
         onSelect={(eventKey) => {
           if (eventKey) {
             eventKey === 'ADD'
-              ? toggleAddingActor(true)
-              : selectActor(parseInt(eventKey));
+              ? toggleAddingCasting(true)
+              : selectCasting(parseInt(eventKey));
           }
         }}
       >
         <Dropdown.Toggle variant="light">
-          {selectedActor.id === -1 ? (
+          {selectedCasting.id === -1 ? (
             <i>No casting selected</i>
           ) : (
-            selectedActor.name
+            selectedCasting.actor.name
           )}
         </Dropdown.Toggle>
         <Dropdown.Menu>
-          {actors.map((actor) => (
-            <Dropdown.Item eventKey={actor.id} key={actor.id}>
-              {actor.name}
+          {castings.map((casting) => (
+            <Dropdown.Item eventKey={casting.id} key={casting.id}>
+              {casting.actor.name}
             </Dropdown.Item>
           ))}
           <Dropdown.Item eventKey="ADD">+ Add new casting</Dropdown.Item>
@@ -54,9 +57,9 @@ export const Character = ({ id, name }: CharacterProps) => {
       </Dropdown>
 
       <CastingModal
-        show={addingActor}
-        hide={() => toggleAddingActor(false)}
-        addActor={addActor}
+        show={addingCasting}
+        hide={() => toggleAddingCasting(false)}
+        addActor={addCasting}
       />
     </Col>
   );

@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace fancast.Models;
 
 public class Casting
@@ -7,5 +9,7 @@ public class Casting
   public int CharacterId { get; set; }
   public Character Character { get; set; } = null!;
   public int ActorId { get; set; }
+  [NotMapped]
+  public Actor Actor { get; set; } = null!;
   public List<User> Users { get; } = new();
 }

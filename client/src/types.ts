@@ -11,6 +11,17 @@ export interface Character {
   name: string;
   actorIds: number[];
   bookId: string;
+  castings?: Casting[];
+}
+
+export interface Casting {
+  id: number;
+  createdAt: Date;
+  characterId: number;
+  character?: Character;
+  actorId: number;
+  actor: Actor;
+  users?: User[];
 }
 
 export interface Actor {
@@ -18,4 +29,10 @@ export interface Actor {
   name: string;
   gender: 'male' | 'female' | 'nonbinary';
   imageLink: string;
+}
+
+export interface User {
+  id: number;
+  username: string;
+  castings: Casting[]
 }

@@ -7,7 +7,7 @@ import { useActorSearch } from '../../../hooks/useActorSearch';
 interface CastingModalProps {
   show: boolean;
   hide: () => void;
-  addActor: (actor: IActor) => Promise<void>;
+  addActor: (actorId: number) => Promise<void>;
 }
 
 export const CastingModal = ({ show, hide, addActor }: CastingModalProps) => {
@@ -52,7 +52,7 @@ export const CastingModal = ({ show, hide, addActor }: CastingModalProps) => {
   }
 
   async function handleAddActor(actor: IActor) {
-    await addActor(actor);
+    await addActor(actor.id);
     handleHide();
   }
 
