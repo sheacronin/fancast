@@ -4,7 +4,8 @@ namespace fancast.Services.CastingsService;
 
 public interface ICastingsService
 {
-  Task<Casting?> GetCasting(int id);
+  Task<Casting?> Get(int id);
+  Task<Casting[]> Search(int? characterId = null, int? actorId = null);
   Task<Casting> CreateCasting(CastingDto castingDto, User user);
-  Task SelectCasting(int castingId);
+  Task<Casting> SelectCasting(int castingId, User user);
 }

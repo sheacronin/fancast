@@ -22,8 +22,8 @@ public class AuthService : IAuthService
   {
     var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
     string id = jwt.Claims.First(claim => claim.Type == "Id").Value;
-    var user = await _context.Users.FindAsync(int.Parse(id));
-    return user!;
+    User user = await _context.Users.Include(u => u.Castings).SingleAsync(u => u.Id == int.Parse(id));
+    return user;
   }
 
   public async Task<User> CreateUser(UserDto userDto)
@@ -42,7 +42,7 @@ public class AuthService : IAuthService
   }
 
   public async Task<User?> FindUser(string username) =>
-    await _context.Users.SingleOrDefaultAsync(u => u.Username == username);
+    await _context.Users.Include(u => u.Castings).SingleOrDefaultAsync(u => u.Username == username);
 
   public async Task<string> ValidateRegistration(UserDto userDto)
   {

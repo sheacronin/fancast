@@ -16,19 +16,18 @@ public class CharactersService : ICharactersService
   public async Task<Character?> Get(int id) =>
     await _context.Characters.Include(c => c.Castings).FirstOrDefaultAsync(c => c.Id == id);
 
-  public async Task<Character[]> GetByBook(string bookId)
-  {
-    return _context.Characters.Where(c => c.BookId == bookId).OrderBy(c => c.Name).ToArray();
-  }
+  public async Task<Character[]> GetByBook(string bookId) =>
+    await _context.Characters.Include(c => c.Castings)
+      .Where(c => c.BookId == bookId).OrderBy(c => c.Name).ToArrayAsync();
 
   public async Task<Character> Create(Character character)
   {
-    if (_context.Characters.Any(c => c.Id == character.Id))
+    if (await _context.Characters.AnyAsync(c => c.Id == character.Id))
     {
       throw new InvalidOperationException("Character with this ID already exists");
     }
     _context.Characters.Add(character);
-    _context.SaveChanges();
+    await _context.SaveChangesAsync();
     return character;
   }
 }

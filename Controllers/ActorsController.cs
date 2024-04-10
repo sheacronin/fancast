@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using fancast.Models;
 using fancast.Services.ActorsService;
+using fancast.Services.CastingsService;
 
 namespace fancast.Controllers;
 
@@ -10,11 +11,15 @@ namespace fancast.Controllers;
 public class ActorsController : ControllerBase
 {
   private readonly IActorsService _actorsService;
+  private readonly ICastingsService _castingsService;
   private readonly ILogger<ActorsController> _logger;
 
-  public ActorsController(ILogger<ActorsController> logger, IActorsService actorsService)
+  public ActorsController(IActorsService actorsService,
+    ICastingsService castingsService,
+    ILogger<ActorsController> logger)
   {
     _actorsService = actorsService;
+    _castingsService = castingsService;
     _logger = logger;
   }
 
@@ -24,19 +29,20 @@ public class ActorsController : ControllerBase
   [HttpGet("characters/{characterId}/[controller]")]
   public async Task<ActionResult<Actor[]>> GetByCharacter(int characterId)
   {
-    try
+    Casting[] results = await _castingsService.Search(characterId);
+    if (results.Length == 0)
     {
-      Actor[] actors = await _actorsService.GetByCharacter(characterId);
-      return actors.Length == 0 ? NoContent() : Ok(actors);
+      return NoContent();
     }
-    catch (Exception e)
+
+    var actors = new List<Actor>();
+    foreach (Casting casting in results)
     {
-      if (e.Message == "The character does not exist")
-      {
-        return BadRequest(e.Message);
-      }
-      throw new HttpRequestException();
+      Actor actor = await _actorsService.Get(casting.ActorId);
+      actors.Add(actor);
     }
+
+    return Ok(actors.OrderBy(a => a.Name).ToArray());
   }
 
   [HttpGet("[controller]")]

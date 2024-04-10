@@ -13,14 +13,19 @@ public class CastingsService : ICastingsService
     _context = context;
   }
 
-  public async Task<Casting?> GetCasting(int id) =>
-    await _context.Castings.Include(c => c.Character).Include(c => c.Users)
+  public async Task<Casting?> Get(int id) =>
+    await _context.Castings
+      .Include(c => c.Character)
+      .Include(c => c.Users)
       .FirstOrDefaultAsync(c => c.Id == id);
+
+  public async Task<Casting[]> Search(int? characterId = null, int? actorId = null) =>
+    await _context.Castings
+      .Where(c => c.CharacterId == characterId || c.ActorId == actorId)
+      .ToArrayAsync();
 
   public async Task<Casting> CreateCasting(CastingDto castingDto, User user)
   {
-    // TODO: handle existing casting
-
     Casting casting = new()
     {
       CharacterId = castingDto.CharacterId,
@@ -33,9 +38,11 @@ public class CastingsService : ICastingsService
     return casting;
   }
 
-  // TODO:
-  public async Task SelectCasting(int castingId)
+  public async Task<Casting> SelectCasting(int castingId, User user)
   {
-    throw new NotImplementedException();
+    Casting casting = await _context.Castings.Include(c => c.Users).SingleAsync(c => c.Id == castingId);
+    casting.Users.Add(user);
+    await _context.SaveChangesAsync();
+    return casting;
   }
 }
