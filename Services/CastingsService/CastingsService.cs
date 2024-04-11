@@ -25,8 +25,19 @@ public class CastingsService : ICastingsService
       .Where(c => c.CharacterId == characterId || c.ActorId == actorId)
       .ToArrayAsync();
 
+  private async Task<bool> Exists(CastingDto castingDto) =>
+    await _context.Castings
+      .AnyAsync(c => c.CharacterId == castingDto.CharacterId && c.ActorId == castingDto.ActorId);
+
   public async Task<Casting> CreateCasting(CastingDto castingDto, User user)
   {
+    // Check if this character/actor pair already exists
+    bool castingExists = await Exists(castingDto);
+    if (castingExists)
+    {
+      throw new InvalidOperationException("This character already has been cast with this actor.");
+    }
+
     Casting casting = new()
     {
       CharacterId = castingDto.CharacterId,
@@ -41,7 +52,26 @@ public class CastingsService : ICastingsService
 
   public async Task<Casting> SelectCasting(int castingId, User user)
   {
-    Casting casting = await _context.Castings.Include(c => c.Users).SingleAsync(c => c.Id == castingId);
+    Casting casting = await _context.Castings
+      .Include(c => c.Users)
+      .FirstOrDefaultAsync(c => c.Id == castingId)
+        ?? throw new InvalidOperationException("Casting with this ID does not exist.");
+
+    // Check if the user already has selected this casting
+    if (casting.Users.Any(u => u.Id == user.Id))
+    {
+      throw new InvalidOperationException("User has already selected this casting.");
+    }
+
+    // Check if the user has a different selected casting for this character
+    Casting? existingCasting = user.Castings.FirstOrDefault(c => c.CharacterId == casting.CharacterId);
+    if (existingCasting is not null)
+    {
+      // If so, remove that casting from the user's castings
+      user.Castings.Remove(existingCasting);
+    }
+
+    // Add relationship between the user and this casting if no errors
     casting.Users.Add(user);
     await _context.SaveChangesAsync();
     return casting;

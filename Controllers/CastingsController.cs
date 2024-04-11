@@ -51,26 +51,40 @@ public class CastingsController : ControllerBase
   [HttpPost("characters/{characterId}/[controller]")]
   public async Task<ActionResult<Casting>> CastCharacter(int characterId, [FromBody] int actorId)
   {
-    var token = Request.Cookies["token"];
-    User user = await _authService.GetCurrentUser(token!);
-    CastingDto castingDto = new()
+    try
     {
-      CharacterId = characterId,
-      ActorId = actorId
-    };
-    Casting casting = await _castingsService.CreateCasting(castingDto, user);
-    casting.Actor = await _actorsService.Get(casting.ActorId);
-    return CreatedAtAction(nameof(Get), new { id = casting.Id }, casting);
+      var token = Request.Cookies["token"];
+      User user = await _authService.GetCurrentUser(token!);
+      CastingDto castingDto = new()
+      {
+        CharacterId = characterId,
+        ActorId = actorId
+      };
+      Casting casting = await _castingsService.CreateCasting(castingDto, user);
+      casting.Actor = await _actorsService.Get(casting.ActorId);
+      return CreatedAtAction(nameof(Get), new { id = casting.Id }, casting);
+    }
+    catch (Exception e)
+    {
+      return BadRequest(e.Message);
+    }
   }
 
   [Authorize]
   [HttpPut("[controller]/{id}")]
   public async Task<ActionResult<Casting>> SelectCasting(int id)
   {
-    var token = Request.Cookies["token"];
-    User user = await _authService.GetCurrentUser(token!);
-    Casting casting = await _castingsService.SelectCasting(id, user);
-    casting.Actor = await _actorsService.Get(casting.ActorId);
-    return Ok(casting);
+    try
+    {
+      var token = Request.Cookies["token"];
+      User user = await _authService.GetCurrentUser(token!);
+      Casting casting = await _castingsService.SelectCasting(id, user);
+      casting.Actor = await _actorsService.Get(casting.ActorId);
+      return Ok(casting);
+    }
+    catch (Exception e)
+    {
+      return BadRequest(e.Message);
+    }
   }
 }

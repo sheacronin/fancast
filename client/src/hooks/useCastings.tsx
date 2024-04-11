@@ -90,7 +90,10 @@ export const useCastings = (characterId: number, userId: number | null) => {
           castingA.actor.name > castingB.actor.name ? 1 : -1
         ),
       });
-      selectCasting(casting.id);
+      dispatch({
+        type: CastingsActionType.SELECT_CASTING,
+        payload: casting.id,
+      });
     } catch (error) {
       console.error(error);
     }

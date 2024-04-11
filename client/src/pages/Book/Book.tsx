@@ -14,7 +14,6 @@ export const Book = () => {
       const getBook = async () => {
         const response = await fetch(`${API_BASE_URL}/books/${id}`);
         const data = await response.json();
-        console.log(data);
         setBook(data);
       };
       getBook();

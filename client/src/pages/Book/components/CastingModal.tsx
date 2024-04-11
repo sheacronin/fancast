@@ -1,16 +1,22 @@
 import type { FormEvent } from 'react';
 import { Modal, ListGroup, Col, Image } from 'react-bootstrap';
 import { InputBar } from '../../../components';
-import type { Actor as IActor } from '../../../types';
+import type { Actor as IActor, Casting } from '../../../types';
 import { useActorSearch } from '../../../hooks/useActorSearch';
 
 interface CastingModalProps {
   show: boolean;
   hide: () => void;
   addActor: (actorId: number) => Promise<void>;
+  castings: Casting[];
 }
 
-export const CastingModal = ({ show, hide, addActor }: CastingModalProps) => {
+export const CastingModal = ({
+  show,
+  hide,
+  addActor,
+  castings,
+}: CastingModalProps) => {
   const { searchResults, hasSearched, searchActors, clearSearch } =
     useActorSearch();
 
@@ -29,9 +35,19 @@ export const CastingModal = ({ show, hide, addActor }: CastingModalProps) => {
         {hasSearched && (
           <ListGroup variant="flush" className="border rounded-bottom">
             {searchResults.length > 0 ? (
-              searchResults.map((actor) => (
-                <Actor actor={actor} addActor={handleAddActor} key={actor.id} />
-              ))
+              searchResults.map((actor) => {
+                const castingExists = castings.some(
+                  (casting) => casting.actorId === actor.id
+                );
+                return (
+                  <Actor
+                    actor={actor}
+                    addActor={handleAddActor}
+                    key={actor.id}
+                    castingExists={castingExists}
+                  />
+                );
+              })
             ) : (
               <ListGroup.Item>No results found.</ListGroup.Item>
             )}
@@ -65,21 +81,26 @@ export const CastingModal = ({ show, hide, addActor }: CastingModalProps) => {
 interface ActorProps {
   actor: IActor;
   addActor: (actor: IActor) => Promise<void>;
+  castingExists: boolean;
 }
 
-const Actor = ({ actor, addActor }: ActorProps) => {
+const Actor = ({ actor, addActor, castingExists }: ActorProps) => {
   return (
     <ListGroup.Item
       action
       onClick={() => addActor(actor)}
-      variant="primary"
-      className="d-flex"
+      variant={!castingExists ? 'primary' : 'danger'}
+      className={'d-flex' + (castingExists ? ' bg-danger-subtle' : '')}
+      disabled={castingExists}
     >
       <Col xs={3}>
         <Image src={actor.imageLink} alt={actor.name} thumbnail />
       </Col>
       <Col className="ms-3">
         <h5>{actor.name}</h5>
+        {castingExists && (
+          <p>This actor has already been cast for this character.</p>
+        )}
       </Col>
     </ListGroup.Item>
   );

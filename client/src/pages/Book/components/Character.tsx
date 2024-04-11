@@ -60,6 +60,7 @@ export const Character = ({ id, name }: CharacterProps) => {
         show={addingCasting}
         hide={() => toggleAddingCasting(false)}
         addActor={addCasting}
+        castings={castings}
       />
     </Col>
   );

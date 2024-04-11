@@ -13,7 +13,6 @@ export const useActorSearch = () => {
   const searchActors = async (name: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/actors?name=${name}`);
-      console.log(response);
       let data: Actor[];
       switch (response.status) {
         case 200:
