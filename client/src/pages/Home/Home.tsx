@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { InputBar } from '../../components';
 import type { Book } from '../../types';
 import { API_BASE_URL } from '../../constants';
+import defaultBookImage from '../../assets/default_book.jpg';
 
 export const Home = () => {
   const [loading, setLoading] = useState(false);
@@ -32,8 +33,10 @@ export const Home = () => {
                 <ListGroup.Item as="li" className="d-flex" key={book.id}>
                   <Col xs={3} sm={2} md={1}>
                     <Image
-                      src={book.imageLink}
-                      alt={`${book.title} Cover`}
+                      src={book.imageLink || defaultBookImage}
+                      alt={`${
+                        book.imageLink ? book.title : 'Placeholder'
+                      } Cover`}
                       thumbnail
                       className="mw-100"
                     />

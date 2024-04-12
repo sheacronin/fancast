@@ -86,7 +86,7 @@ export const Book = () => {
           <>
             <h2>{book.title}</h2>
             {book.authors && <h3>{book.authors.join(', ')}</h3>}
-            <Col xs={12} sm={6} md={5} lg={3} className="mb-2">
+            <Col xs={12} sm={6} md={5} lg={3} className="mb-2 text-center">
               <Image
                 src={book.imageLink}
                 alt={`${book.title} Cover`}

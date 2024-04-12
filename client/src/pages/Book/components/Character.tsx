@@ -46,7 +46,7 @@ export const Character = ({ id, name }: CharacterProps) => {
 
   return (
     <Col xs={12} md={6} lg={4} className="p-3">
-      <p>{name}</p>
+      <h5 className="text-uppercase">{name}</h5>
       {loading ? (
         loadingUI
       ) : (
