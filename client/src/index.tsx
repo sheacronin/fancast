@@ -5,7 +5,7 @@ import { Home, Book, Register, Login } from './pages';
 import { AuthProvider, UnauthenticatedRoute, userLoader } from './context';
 import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import './index.scss';
 
 const router = createBrowserRouter([
   {

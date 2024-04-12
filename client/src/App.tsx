@@ -8,7 +8,7 @@ const App = () => {
   const { logout } = useAuthDispatch();
 
   return (
-    <>
+    <div className="bg-light vw-100 min-vh-100">
       <Navbar bg="dark" className="mb-4 text-light" data-bs-theme="dark">
         <Container>
           <Navbar.Brand as={Link} to="/">
@@ -38,7 +38,7 @@ const App = () => {
       <Container as="main" className="pb-5">
         <Outlet />
       </Container>
-    </>
+    </div>
   );
 };
 
