@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useReducer } from 'react';
 import { Casting } from '../types';
 import { API_BASE_URL } from '../constants';
+import defaultActorImage from '../assets/default_actor.jpg';
 
 enum CastingsActionType {
   SET_LOADING = 'SET_LOADING',
@@ -187,7 +188,6 @@ const CASTING_PLACEHOLDER: Casting = {
     id: -1,
     name: 'Unknown person',
     gender: 'nonbinary',
-    imageLink:
-      'https://upload.wikimedia.org/wikipedia/commons/b/bc/Unknown_person.jpg',
+    imageLink: defaultActorImage,
   },
 };
