@@ -3,6 +3,7 @@ import { Casting } from '../types';
 import { API_BASE_URL } from '../constants';
 
 enum CastingsActionType {
+  SET_LOADING = 'SET_LOADING',
   GET_CASTINGS = 'GET_CASTINGS',
   SELECT_CASTING = 'SELECT_CASTING',
   TOGGLE_ADDING = 'TOGGLE_ADDING',
@@ -17,6 +18,7 @@ export const useCastings = (characterId: number, userId: number | null) => {
 
   const getCastings = useCallback(async () => {
     try {
+      dispatch({ type: CastingsActionType.SET_LOADING, payload: true });
       const response = await fetch(
         `${API_BASE_URL}/characters/${characterId}/castings`
       );
@@ -48,6 +50,7 @@ export const useCastings = (characterId: number, userId: number | null) => {
     } catch (error) {
       console.error(error);
     }
+    dispatch({ type: CastingsActionType.SET_LOADING, payload: false });
   }, [characterId, userId]);
 
   const selectCasting = async (castingId: number) => {
@@ -116,16 +119,20 @@ interface CastingsState {
   castings: Casting[];
   selectedCastingId: number | null;
   addingCasting: boolean;
+  loading: boolean;
 }
 
 const initialState = {
   castings: [],
   selectedCastingId: null,
   addingCasting: false,
+  loading: false,
 };
 
 const reducer = (state: CastingsState, action: CastingsAction) => {
   switch (action.type) {
+    case CastingsActionType.SET_LOADING:
+      return { ...state, loading: action.payload };
     case CastingsActionType.GET_CASTINGS:
       return { ...state, castings: action.payload };
     case CastingsActionType.SELECT_CASTING:
@@ -140,10 +147,16 @@ const reducer = (state: CastingsState, action: CastingsAction) => {
 };
 
 type CastingsAction =
+  | ActionSetLoading
   | ActionGetCasting
   | ActionSelectCasting
   | ActionToggleAdding
   | ActionAddCasting;
+
+interface ActionSetLoading {
+  type: CastingsActionType.SET_LOADING;
+  payload: boolean;
+}
 
 interface ActionGetCasting {
   type: CastingsActionType.GET_CASTINGS;

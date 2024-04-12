@@ -1,5 +1,5 @@
 import type { FormEvent } from 'react';
-import { Modal, ListGroup, Col, Image } from 'react-bootstrap';
+import { Modal, ListGroup, Col, Image, Spinner } from 'react-bootstrap';
 import { InputBar } from '../../../components';
 import type { Actor as IActor, Casting } from '../../../types';
 import { useActorSearch } from '../../../hooks/useActorSearch';
@@ -17,7 +17,7 @@ export const CastingModal = ({
   addActor,
   castings,
 }: CastingModalProps) => {
-  const { searchResults, hasSearched, searchActors, clearSearch } =
+  const { searchResults, hasSearched, loading, searchActors, clearSearch } =
     useActorSearch();
 
   return (
@@ -34,7 +34,13 @@ export const CastingModal = ({
         />
         {hasSearched && (
           <ListGroup variant="flush" className="border rounded-bottom">
-            {searchResults.length > 0 ? (
+            {loading ? (
+              <ListGroup.Item className="d-flex justify-content-center p-3">
+                <Spinner animation="border" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </Spinner>
+              </ListGroup.Item>
+            ) : searchResults.length > 0 ? (
               searchResults.map((actor) => {
                 const castingExists = castings.some(
                   (casting) => casting.actorId === actor.id
