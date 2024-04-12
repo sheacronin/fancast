@@ -76,7 +76,14 @@ export const Character = ({ id, name }: CharacterProps) => {
             </Dropdown.Toggle>
             <Dropdown.Menu>
               {castings.map((casting) => (
-                <Dropdown.Item eventKey={casting.id} key={casting.id}>
+                <Dropdown.Item
+                  eventKey={casting.id}
+                  key={casting.id}
+                  disabled={casting.id === selectedCasting.id}
+                  className={
+                    casting.id === selectedCasting.id ? 'bg-primary-subtle' : ''
+                  }
+                >
                   {casting.actor.name}
                 </Dropdown.Item>
               ))}
