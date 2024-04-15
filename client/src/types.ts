@@ -22,6 +22,7 @@ export interface Casting {
   actorId: number;
   actor: Actor;
   users?: User[];
+  book?: Book;
 }
 
 export interface Actor {

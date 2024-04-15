@@ -19,6 +19,17 @@ public class CastingsService : ICastingsService
       .Include(c => c.Users)
       .FirstOrDefaultAsync(c => c.Id == id);
 
+  public async Task<Casting[]> GetRecent(int userId, int limit)
+  {
+    return await _context.Castings
+      .Include(c => c.Character)
+      .Include(c => c.Users)
+      .Where(c => userId == -1 || c.Users.Any(u => u.Id == userId))
+      .OrderByDescending(c => c.CreatedAt)
+      .Take(limit)
+      .ToArrayAsync();
+  }
+
   public async Task<Casting[]> Search(int? characterId = null, int? actorId = null) =>
     await _context.Castings
       .Include(c => c.Users)

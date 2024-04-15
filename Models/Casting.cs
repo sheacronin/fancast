@@ -11,5 +11,7 @@ public class Casting
   public int ActorId { get; set; }
   [NotMapped]
   public Actor Actor { get; set; } = null!;
+  [NotMapped]
+  public Book Book { get; set; } = null!;
   public List<User> Users { get; } = new();
 }

@@ -4,6 +4,7 @@ using fancast.Models;
 using fancast.Services.AuthService;
 using fancast.Services.CastingsService;
 using fancast.Services.ActorsService;
+using fancast.Services.BooksService;
 
 namespace fancast.Controllers;
 
@@ -13,13 +14,21 @@ public class CastingsController : ControllerBase
 {
   private readonly ICastingsService _castingsService;
   private readonly IActorsService _actorsService;
+  private readonly IBooksService _booksService;
   private readonly IAuthService _authService;
   private readonly ILogger<CastingsController> _logger;
 
-  public CastingsController(ICastingsService castingsService, IActorsService actorsService, IAuthService authService, ILogger<CastingsController> logger)
+  public CastingsController(
+    ICastingsService castingsService,
+    IActorsService actorsService,
+    IBooksService booksService,
+    IAuthService authService,
+    ILogger<CastingsController> logger
+  )
   {
     _castingsService = castingsService;
     _actorsService = actorsService;
+    _booksService = booksService;
     _authService = authService;
     _logger = logger;
   }
@@ -29,6 +38,24 @@ public class CastingsController : ControllerBase
   {
     Casting? casting = await _castingsService.Get(id);
     return casting == null ? NotFound() : Ok(casting);
+  }
+
+
+  [HttpGet("[controller]")]
+  public async Task<ActionResult<Casting[]>> GetRecentCastings([FromQuery] int userId = -1, [FromQuery] int limit = 10)
+  {
+    Casting[] castings = await _castingsService.GetRecent(userId, limit);
+    if (castings.Length == 0)
+    {
+      return NoContent();
+    }
+
+    foreach (Casting casting in castings)
+    {
+      casting.Book = await _booksService.Get(casting.Character.BookId);
+      casting.Actor = await _actorsService.Get(casting.ActorId);
+    }
+    return Ok(castings);
   }
 
   [HttpGet("characters/{characterId}/[controller]")]
