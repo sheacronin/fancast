@@ -54,11 +54,7 @@ builder.Services.AddDbContext<FancastContext>(options =>
     options.UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddOutputCache(options =>
-{
-    options.AddBasePolicy(builder =>
-        builder.Expire(TimeSpan.FromHours(3)));
-});
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 
@@ -80,7 +76,6 @@ using (var scope = app.Services.CreateScope())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-// app.UseOutputCache();
 app.UseAuthentication();
 app.UseAuthorization();
 

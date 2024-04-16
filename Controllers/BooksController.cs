@@ -6,7 +6,7 @@ using fancast.Services.BooksService;
 namespace fancast.Controllers;
 
 [ApiController]
-[Route("api")]
+[Route("api/[controller]")]
 public class BooksController : ControllerBase
 {
   private readonly IBooksService _booksService;
@@ -18,11 +18,17 @@ public class BooksController : ControllerBase
     _logger = logger;
   }
 
-  [HttpGet("[controller]/{id}")]
-  public async Task<ActionResult<Book>> Get(string id) => Ok(await _booksService.Get(id));
+  [HttpGet("{id}")]
+  public async Task<ActionResult<Book>> Get(string id)
+  {
+    Book? book = await _booksService.Get(id);
+    return book is null ? NotFound() : Ok(await _booksService.Get(id));
+  }
 
-
-  [HttpGet("[controller]")]
-  public async Task<ActionResult<Book[]>> Search([Required] string title) =>
-    Ok(await _booksService.Search(title));
+  [HttpGet]
+  public async Task<ActionResult<Book[]>> Search([Required] string title)
+  {
+    Book[] results = await _booksService.Search(title);
+    return results.Length == 0 ? NoContent() : Ok(results);
+  }
 }

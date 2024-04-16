@@ -6,7 +6,7 @@ using fancast.Services.ActorsService;
 namespace fancast.Controllers;
 
 [ApiController]
-[Route("api")]
+[Route("api/[controller]")]
 public class ActorsController : ControllerBase
 {
   private readonly IActorsService _actorsService;
@@ -18,10 +18,14 @@ public class ActorsController : ControllerBase
     _logger = logger;
   }
 
-  [HttpGet("[controller]/{id}")]
-  public async Task<ActionResult<Actor>> Get(int id) => Ok(await _actorsService.Get(id));
+  [HttpGet("{id}")]
+  public async Task<ActionResult<Actor>> Get(int id)
+  {
+    Actor? actor = await _actorsService.Get(id);
+    return actor is null ? NotFound() : Ok(actor);
+  }
 
-  [HttpGet("[controller]")]
+  [HttpGet]
   public async Task<ActionResult<Actor[]>> Search([Required] string name)
   {
     Actor[] results = await _actorsService.Search(name);

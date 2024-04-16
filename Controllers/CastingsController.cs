@@ -50,11 +50,38 @@ public class CastingsController : ControllerBase
       return NoContent();
     }
 
+    // Create lists of books and actors so that the same resources
+    // are not fetched multiple times
+    List<Book> books = new();
+    List<Actor> actors = new();
+
     foreach (Casting casting in castings)
     {
-      casting.Book = await _booksService.Get(casting.Character.BookId);
-      casting.Actor = await _actorsService.Get(casting.ActorId);
+      Book? book = books.FirstOrDefault(b => b.Id == casting.Character.BookId);
+      if (book is not null)
+      {
+        casting.Book = book;
+      }
+      else
+      {
+        Book? fetchedBook = await _booksService.Get(casting.Character.BookId);
+        casting.Book = fetchedBook!;
+        books.Add(fetchedBook!);
+      }
+
+      Actor? actor = actors.FirstOrDefault(a => a.Id == casting.ActorId);
+      if (actor is not null)
+      {
+        casting.Actor = actor;
+      }
+      else
+      {
+        Actor? fetchedActor = await _actorsService.Get(casting.ActorId);
+        casting.Actor = fetchedActor!;
+        actors.Add(fetchedActor!);
+      }
     }
+
     return Ok(castings);
   }
 
@@ -69,7 +96,8 @@ public class CastingsController : ControllerBase
 
     foreach (Casting casting in castings)
     {
-      casting.Actor = await _actorsService.Get(casting.ActorId);
+      Actor? actor = await _actorsService.Get(casting.ActorId);
+      casting.Actor = actor!;
     }
     return Ok(castings.OrderBy(c => c.Actor.Name).ToArray());
   }
@@ -88,7 +116,8 @@ public class CastingsController : ControllerBase
         ActorId = actorId
       };
       Casting casting = await _castingsService.CreateCasting(castingDto, user);
-      casting.Actor = await _actorsService.Get(casting.ActorId);
+      Actor? actor = await _actorsService.Get(casting.ActorId);
+      casting.Actor = actor!;
       return CreatedAtAction(nameof(Get), new { id = casting.Id }, casting);
     }
     catch (Exception e)
@@ -106,7 +135,8 @@ public class CastingsController : ControllerBase
       var token = Request.Cookies["token"];
       User user = await _authService.GetCurrentUser(token!);
       Casting casting = await _castingsService.SelectCasting(id, user);
-      casting.Actor = await _actorsService.Get(casting.ActorId);
+      Actor? actor = await _actorsService.Get(casting.ActorId);
+      casting.Actor = actor!;
       return Ok(casting);
     }
     catch (Exception e)

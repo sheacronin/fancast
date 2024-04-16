@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 using TMDbLib.Client;
 using TMDbLib.Objects.People;
 using TMDbLib.Objects.General;
@@ -9,23 +10,48 @@ namespace fancast.Services.ActorsService;
 public class ActorsService : IActorsService
 {
   private static readonly TMDbClient _client = new(Environment.GetEnvironmentVariable("TMDB_API_KEY"));
+  private readonly IMemoryCache _cache;
+  private static readonly TimeSpan _cacheTime = TimeSpan.FromHours(6);
 
-  public async Task<Actor> Get(int id)
+  public ActorsService(IMemoryCache cache)
   {
-    Person person = await _client.GetPersonAsync(id);
-    return new Actor(person);
+    _cache = cache;
+  }
+
+  public async Task<Actor?> Get(int id)
+  {
+    string cacheKey = $"actor_{id}";
+
+    Actor? actor = await _cache.GetOrCreateAsync(cacheKey, async entry =>
+    {
+      entry.SetSlidingExpiration(_cacheTime);
+
+      Person person = await _client.GetPersonAsync(id);
+      return person is null ? null : new Actor(person);
+    });
+
+    return actor;
   }
 
   public async Task<Actor[]> Search(string name)
   {
-    SearchContainer<SearchPerson> results = await _client.SearchPersonAsync(name);
-    IList<Actor> actors = new List<Actor>();
-    foreach (SearchPerson result in results.Results)
+    string cacheKey = $"actorSearch_{name}";
+
+    Actor[]? actors = await _cache.GetOrCreateAsync(cacheKey, async entry =>
     {
-      Person person = await _client.GetPersonAsync(result.Id);
-      Actor actor = new(person);
-      actors.Add(actor);
-    }
-    return actors.ToArray();
+      entry.SetSlidingExpiration(_cacheTime);
+
+      SearchContainer<SearchPerson> results = await _client.SearchPersonAsync(name);
+      IList<Actor> actorsList = new List<Actor>();
+      foreach (SearchPerson result in results.Results)
+      {
+        Person person = await _client.GetPersonAsync(result.Id);
+        Actor actor = new(person);
+        actorsList.Add(actor);
+      }
+      return actorsList.ToArray();
+    });
+
+    return actors!;
   }
 }
