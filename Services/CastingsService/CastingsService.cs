@@ -54,6 +54,7 @@ public class CastingsService : ICastingsService
       CharacterId = castingDto.CharacterId,
       ActorId = castingDto.ActorId,
     };
+    RemoveExistingCastings(user, casting.CharacterId);
     casting.Users.Add(user);
 
     await _context.Castings.AddAsync(casting);
@@ -74,17 +75,22 @@ public class CastingsService : ICastingsService
       throw new InvalidOperationException("User has already selected this casting.");
     }
 
-    // Check if the user has a different selected casting for this character
-    Casting? existingCasting = user.Castings.FirstOrDefault(c => c.CharacterId == casting.CharacterId);
-    if (existingCasting is not null)
-    {
-      // If so, remove that casting from the user's castings
-      user.Castings.Remove(existingCasting);
-    }
+    RemoveExistingCastings(user, casting.CharacterId);
 
     // Add relationship between the user and this casting if no errors
     casting.Users.Add(user);
     await _context.SaveChangesAsync();
     return casting;
+  }
+
+  private static void RemoveExistingCastings(User user, int characterId)
+  {
+    // Check if the user has a different selected casting for this character
+    Casting? existingCasting = user.Castings.FirstOrDefault(c => c.CharacterId == characterId);
+    if (existingCasting is not null)
+    {
+      // If so, remove that casting from the user's castings
+      user.Castings.Remove(existingCasting);
+    }
   }
 }
