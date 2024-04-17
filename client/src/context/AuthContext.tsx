@@ -73,17 +73,22 @@ export const AuthProvider = () => {
 };
 
 export const userLoader = async () => {
-  const response = await fetch(`${API_BASE_URL}/auth/current-user`, {
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/current-user`, {
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
 
-  if (response.ok) {
-    return await response.json();
+    if (response.status === 200) {
+      return await response.json();
+    }
+
+    // If the response isn't 200 OK, return null user
+    return null;
+  } catch (error) {
+    console.error(error);
+    return null;
   }
-
-  // If the response isn't OK, return null user
-  return null;
 };
 
 export const UnauthenticatedRoute = () => {

@@ -16,11 +16,16 @@ public class AuthController : ControllerBase
     _authService = authService;
   }
 
-  [Authorize]
   [HttpGet("current-user")]
-  public async Task<ActionResult<User>> GetCurrentUser()
+  public async Task<ActionResult<User?>> GetCurrentUser()
   {
     string token = Request.Cookies["token"]!;
+
+    if (token is null)
+    {
+      return NoContent();
+    }
+
     User user = await _authService.GetCurrentUser(token);
     return Ok(user);
   }
