@@ -81,20 +81,35 @@ export const RecentCastings = () => {
                 </Card.Body>
                 <Card.Footer>
                   <Stack direction="horizontal" gap={2} className="flex-wrap">
-                    {users!.slice(0, 6).map((u) => (
+                    {!users || users.length === 0 ? (
                       <Badge
-                        key={u.id}
-                        bg="primary"
                         pill
-                        className="text-uppercase"
+                        className="bg-secondary text-dark text-uppercase fw-normal"
                       >
-                        {u.username}
+                        N/A
                       </Badge>
-                    ))}
-                    {users!.length > 7 && (
-                      <Badge bg="primary" pill className="text-uppercase">
-                        ...
-                      </Badge>
+                    ) : (
+                      <>
+                        {users.slice(0, 6).map((u) => (
+                          <Badge
+                            key={u.id}
+                            bg="primary"
+                            pill
+                            className="text-uppercase fw-normal"
+                          >
+                            {u.username}
+                          </Badge>
+                        ))}
+                        {users!.length > 7 && (
+                          <Badge
+                            bg="primary"
+                            pill
+                            className="text-uppercase fw-normal"
+                          >
+                            ...
+                          </Badge>
+                        )}
+                      </>
                     )}
                   </Stack>
                 </Card.Footer>
