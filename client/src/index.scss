@@ -1,10 +1,40 @@
-@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+// Import functions
+@import '~bootstrap/scss/functions';
 
+// Custom classes
+.custom-carousel {
+  .carousel-control-prev, .carousel-control-next {
+    bottom: 3rem;
+  }
+}
+
+.single-carousel {
+  .carousel-control-prev, .carousel-control-next {
+    display: none;
+    visibility: hidden;
+  }
+}
+
+// Default variable overrides
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
 $font-family-base: "Lexend", sans-serif;
+
 $primary: #4E6A57;
 $secondary: #D2D0BA;
 $danger: #CB847C;
+$info: #4E606A;
 $light: #EFEEE6;
 $dark: #232B2F;
 
+// Import default Bootstrap variables
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/variables-dark';
+
+// Default map overrides
+$custom-colors: (
+  "danger-dark": #92433A
+);
+$theme-colors: map-merge($theme-colors, $custom-colors);
+
+// Import the rest of Bootstrap
 @import '~bootstrap/scss/bootstrap';

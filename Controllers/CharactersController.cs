@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using fancast.Models;
 using fancast.Services.CharactersService;
 
@@ -31,6 +32,7 @@ public class CharactersController : ControllerBase
     return characters.Length == 0 ? NoContent() : Ok(characters);
   }
 
+  [Authorize]
   [HttpPost("[controller]")]
   public async Task<ActionResult<Character>> Create([FromBody] Character character)
   {

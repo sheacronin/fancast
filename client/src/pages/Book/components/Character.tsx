@@ -5,6 +5,7 @@ import {
   Spinner,
   Ratio,
   Placeholder,
+  Carousel,
 } from 'react-bootstrap';
 import { CastingModal } from './CastingModal';
 import { useCastings } from '../../../hooks/useCastings';
@@ -44,18 +45,42 @@ export const Character = ({ id, name }: CharacterProps) => {
     </>
   );
 
+  const unauthUI = (
+    <Carousel
+      variant="dark"
+      indicators={false}
+      className={
+        'custom-carousel' + (castings.length === 1 ? ' single-carousel' : '')
+      }
+    >
+      {castings.map(({ id, actor }) => (
+        <Carousel.Item key={id}>
+          <Image
+            src={actor.imageLink}
+            alt={actor.name}
+            rounded
+            className="w-50"
+          />
+          <p className="mt-4 mb-0">{actor.name}</p>
+        </Carousel.Item>
+      ))}
+    </Carousel>
+  );
+
   return (
     <Col xs={12} md={6} lg={4} className="p-3">
       <h5 className="text-uppercase">{name}</h5>
       {loading ? (
         loadingUI
+      ) : user === null ? (
+        unauthUI
       ) : (
         <>
           <Image
             src={selectedCasting.actor.imageLink}
             alt={selectedCasting.actor.name}
-            className="w-50"
             rounded
+            className="w-50"
           />
           <Dropdown
             className="mt-3"
