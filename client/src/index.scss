@@ -32,9 +32,15 @@ $dark: #232B2F;
 
 // Default map overrides
 $custom-colors: (
-  "danger-dark": #92433A
+  "danger-dark": #92433A,
+  "secondary-dark": #4A4830
 );
 $theme-colors: map-merge($theme-colors, $custom-colors);
+
+$custom-font-sizes: (
+  7: $font-size-base * 0.75
+);
+$font-sizes: map-merge($font-sizes, $custom-font-sizes);
 
 // Import the rest of Bootstrap
 @import '~bootstrap/scss/bootstrap';

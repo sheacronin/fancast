@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, Fragment } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Row, Col, Image, Ratio, Spinner, Placeholder } from 'react-bootstrap';
 import type { Book as IBook } from '../../types';
 import { CharactersSection } from './components/CharactersSection';
@@ -93,6 +93,13 @@ export const Book = () => {
                 fluid
                 rounded
               />
+              <Link
+                to={`https://www.google.com/books/edition/_/${id}`}
+                target="_blank"
+                className="d-block mt-3 fs-7 text-info"
+              >
+                Google Books Page
+              </Link>
             </Col>
             <Col>
               {book.description && (

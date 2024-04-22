@@ -15,7 +15,7 @@ export const Home = () => {
   return (
     <>
       <Row className="justify-content-center">
-        <Col md={8}>
+        <Col md={8} className="position-relative">
           <InputBar
             handleSubmit={handleBookSearch}
             controlId="search"
@@ -26,7 +26,7 @@ export const Home = () => {
             <ListGroup
               as="ul"
               variant="flush"
-              className="border rounded-bottom"
+              className="z-1 position-absolute start-0 end-0 mx-3 border rounded-bottom shadow"
             >
               {loading ? (
                 <ListGroup.Item className="d-flex justify-content-center p-3">
@@ -56,6 +56,15 @@ export const Home = () => {
                   </ListGroup.Item>
                 ))
               )}
+              <ListGroup.Item variant="info" className="text-end fs-7">
+                <Link to="https://www.google.com/">
+                  <Image
+                    src="https://books.google.com/googlebooks/images/poweredby.png"
+                    alt="Powered by Google"
+                    width={50}
+                  />
+                </Link>
+              </ListGroup.Item>
             </ListGroup>
           )}
         </Col>
