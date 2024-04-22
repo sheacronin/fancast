@@ -21,6 +21,9 @@ export const Home = () => {
             controlId="search"
             label="Book search"
             placeholder="Book title"
+            searchClearIcons
+            showClear={booksList.length > 0}
+            clearEffect={clearBookSearch}
           />
           {(booksList.length > 0 || loading) && (
             <ListGroup
@@ -86,5 +89,9 @@ export const Home = () => {
     const data = await response.json();
     setBooksList(data);
     setLoading(false);
+  }
+
+  function clearBookSearch() {
+    setBooksList([]);
   }
 };
