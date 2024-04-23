@@ -4,6 +4,7 @@ import { useAuth } from '../../../context';
 import type { Casting, User } from '../../../types';
 import { API_BASE_URL } from '../../../constants';
 import { Link } from 'react-router-dom';
+import defaultActorImageAlt from '../../../assets/default_actor_alt.jpg';
 
 export const RecentCastings = () => {
   const { user } = useAuth();
@@ -65,7 +66,7 @@ export const RecentCastings = () => {
                     style={{ borderTopRightRadius: 0 }}
                   />
                   <Card.Img
-                    src={actor.imageLink}
+                    src={actor.imageLink || defaultActorImageAlt}
                     variant="top"
                     className="w-50 object-fit-cover"
                     style={{ borderTopLeftRadius: 0 }}

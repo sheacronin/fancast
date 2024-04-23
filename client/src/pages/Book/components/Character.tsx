@@ -1,6 +1,5 @@
 import {
   Col,
-  Image,
   Dropdown,
   Spinner,
   Ratio,
@@ -8,6 +7,7 @@ import {
   Carousel,
 } from 'react-bootstrap';
 import { CastingModal } from './CastingModal';
+import { ActorImage } from '../../../components';
 import { useCastings } from '../../../hooks/useCastings';
 import { useAuth } from '../../../context';
 
@@ -55,12 +55,7 @@ export const Character = ({ id, name }: CharacterProps) => {
     >
       {castings.map(({ id, actor }) => (
         <Carousel.Item key={id}>
-          <Image
-            src={actor.imageLink}
-            alt={actor.name}
-            rounded
-            className="w-50"
-          />
+          <ActorImage actor={actor} width={50} />
           <p className="mt-4 mb-0">{actor.name}</p>
         </Carousel.Item>
       ))}
@@ -76,12 +71,7 @@ export const Character = ({ id, name }: CharacterProps) => {
         unauthUI
       ) : (
         <>
-          <Image
-            src={selectedCasting.actor.imageLink}
-            alt={selectedCasting.actor.name}
-            rounded
-            className="w-50"
-          />
+          <ActorImage actor={selectedCasting.actor} width={50} />
           <Dropdown
             className="mt-3"
             onSelect={(eventKey) => {

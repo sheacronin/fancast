@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react';
-import { Modal, ListGroup, Col, Image, Spinner } from 'react-bootstrap';
-import { SearchBar } from '../../../components';
+import { Modal, ListGroup, Col, Spinner } from 'react-bootstrap';
+import { SearchBar, ActorImage } from '../../../components';
 import type { Actor as IActor, Casting } from '../../../types';
 import { useActorSearch } from '../../../hooks/useActorSearch';
 
@@ -100,7 +100,7 @@ const Actor = ({ actor, addActor, castingExists }: ActorProps) => {
       disabled={castingExists}
     >
       <Col xs={3}>
-        <Image src={actor.imageLink} alt={actor.name} thumbnail />
+        <ActorImage actor={actor} thumbnail />
       </Col>
       <Col className="ms-3">
         <h5>{actor.name}</h5>
