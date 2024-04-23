@@ -34,7 +34,18 @@ export const RecentCastings = () => {
         }
       );
 
-      return await response.json();
+      let data: Casting[];
+      switch (response.status) {
+        case 200:
+          data = await response.json();
+          break;
+        case 204: // No Content
+          data = [];
+          break;
+        default:
+          throw new Error('There was a server issue.');
+      }
+      return data;
     }
   }, [user]);
 
