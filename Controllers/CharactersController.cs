@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using System.Text.Json;
 using fancast.Models;
 using fancast.Services.CharactersService;
+using fancast.Exceptons;
 
 namespace fancast.Controllers;
 
@@ -43,9 +45,13 @@ public class CharactersController : ControllerBase
     }
     catch (Exception e)
     {
-      if (e.Message == "Character with this ID already exists")
+      if (e is ConflictException)
       {
-        return Conflict(e.Message);
+        return Conflict(JsonSerializer.Serialize(e.Message));
+      }
+      if (e is InvalidOperationException)
+      {
+        return BadRequest(JsonSerializer.Serialize(e.Message));
       }
       throw new HttpRequestException();
     }

@@ -1,10 +1,9 @@
-import type { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { Character } from './Character';
-import { InputBar } from '../../../components';
 import { Row, Col, Button } from 'react-bootstrap';
 import { useCharacters } from '../../../hooks/useCharacters';
 import { useAuth } from '../../../context';
+import { AddCharacterInput } from './AddCharacterInput';
 
 interface CharacterProps {
   bookId: string;
@@ -39,13 +38,10 @@ export const CharactersSection = ({ bookId }: CharacterProps) => {
               {!addingCharacter ? '+ Add Character' : 'Cancel'}
             </Button>
             {addingCharacter && (
-              <InputBar
-                handleSubmit={handleCharacterSubmit}
-                controlId="characterName"
-                label="Character name"
-                placeholder="Ponyboy Curtis"
-                buttonText="Submit"
-                floatingLabel
+              <AddCharacterInput
+                characters={characters}
+                addCharacter={addCharacter}
+                bookId={bookId}
               />
             )}
           </Col>
@@ -62,20 +58,4 @@ export const CharactersSection = ({ bookId }: CharacterProps) => {
       </Row>
     </Row>
   );
-
-  function handleCharacterSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    const { characterName } = e.target as typeof e.target & {
-      characterName: { value: string };
-    };
-
-    const character = {
-      name: characterName.value,
-      actorIds: [],
-      bookId,
-    };
-
-    addCharacter(character);
-  }
 };

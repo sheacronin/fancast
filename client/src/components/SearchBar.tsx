@@ -1,52 +1,27 @@
 import type { FormEventHandler } from 'react';
-import {
-  Form,
-  InputGroup,
-  FloatingLabel,
-  Button,
-  CloseButton,
-  Image,
-} from 'react-bootstrap';
+import { Form, InputGroup, Button, CloseButton, Image } from 'react-bootstrap';
 import searchSvg from '../assets/search_icon.svg';
 
-interface InputBarProps {
+interface SearchBarProps {
   handleSubmit: FormEventHandler;
   controlId: string;
   label: string;
   placeholder: string;
-  buttonText?: string;
-  floatingLabel?: boolean;
   searchClearIcons?: boolean;
   showClear?: boolean;
   clearEffect?: () => void;
 }
 
-export const InputBar = ({
+export const SearchBar = ({
   handleSubmit,
   controlId,
   label,
   placeholder,
-  buttonText = 'Search',
-  floatingLabel = false,
   searchClearIcons = false,
   showClear = false,
   clearEffect,
-}: InputBarProps) => {
-  const formControl = (
-    <Form.Control
-      type="text"
-      placeholder={placeholder}
-      className={searchClearIcons ? 'z-2 rounded-start ps-5' : ''}
-    />
-  );
-  const button = (
-    <Button variant="primary" type="submit">
-      {buttonText}
-    </Button>
-  );
-
+}: SearchBarProps) => {
   // The following icons will be used if the searchClearIcons prop is true
-  // and if the floatingLabel prop is false
   const searchIcon = (
     <Image
       src={searchSvg}
@@ -69,23 +44,20 @@ export const InputBar = ({
 
   return (
     <Form onSubmit={handleSubmit}>
-      {floatingLabel ? (
+      <Form.Group controlId={controlId}>
+        <Form.Label>{label}</Form.Label>
         <InputGroup>
-          <FloatingLabel controlId={controlId} label={label}>
-            {formControl}
-          </FloatingLabel>
-          {button}
+          {searchClearIcons && (showClear ? clearButton : searchIcon)}
+          <Form.Control
+            type="text"
+            placeholder={placeholder}
+            className={searchClearIcons ? 'z-2 rounded-start ps-5' : ''}
+          />
+          <Button variant="primary" type="submit">
+            Search
+          </Button>
         </InputGroup>
-      ) : (
-        <Form.Group controlId={controlId}>
-          <Form.Label>{label}</Form.Label>
-          <InputGroup>
-            {searchClearIcons && (showClear ? clearButton : searchIcon)}
-            {formControl}
-            {button}
-          </InputGroup>
-        </Form.Group>
-      )}
+      </Form.Group>
     </Form>
   );
 };

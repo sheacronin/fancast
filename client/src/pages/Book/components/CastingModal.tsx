@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react';
 import { Modal, ListGroup, Col, Image, Spinner } from 'react-bootstrap';
-import { InputBar } from '../../../components';
+import { SearchBar } from '../../../components';
 import type { Actor as IActor, Casting } from '../../../types';
 import { useActorSearch } from '../../../hooks/useActorSearch';
 
@@ -26,7 +26,7 @@ export const CastingModal = ({
         <Modal.Title>Add a Casting</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <InputBar
+        <SearchBar
           handleSubmit={handleSearchSubmit}
           controlId="actorSearch"
           label="Actor search"

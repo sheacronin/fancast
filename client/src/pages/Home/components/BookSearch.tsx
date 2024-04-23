@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Col, ListGroup, Spinner, Image } from 'react-bootstrap';
-import { InputBar } from '../../../components';
+import { SearchBar } from '../../../components';
 import { useBookSearch } from '../../../hooks/useBookSearch';
 import defaultBookImage from '../../../assets/default_book.jpg';
 import type { FormEvent } from 'react';
@@ -11,7 +11,7 @@ export const BookSearch = () => {
 
   return (
     <Col md={8} className="position-relative">
-      <InputBar
+      <SearchBar
         handleSubmit={handleSearchSubmit}
         controlId="search"
         label="Book search"

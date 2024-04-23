@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using fancast.Models;
 using fancast.Data;
+using fancast.Exceptons;
 
 namespace fancast.Services.CharactersService;
 
@@ -46,10 +47,8 @@ public class CharactersService : ICharactersService
 
   public async Task<Character> Create(Character character)
   {
-    if (await _context.Characters.AnyAsync(c => c.Id == character.Id))
-    {
-      throw new InvalidOperationException("Character with this ID already exists");
-    }
+    await ValidateCharacter(character);
+
     _context.Characters.Add(character);
     await _context.SaveChangesAsync();
 
@@ -73,5 +72,21 @@ public class CharactersService : ICharactersService
     _cache.Set(bookCharactersCacheKey, updatedBookCharacters, _cacheEntryOptions);
 
     return character;
+  }
+
+  private async Task ValidateCharacter(Character character)
+  {
+    if (character.Name == string.Empty)
+    {
+      throw new InvalidOperationException("Character name must not be empty.");
+    }
+    if (await _context.Characters.AnyAsync(c => c.Id == character.Id))
+    {
+      throw new ConflictException("Character with this ID already exists.");
+    }
+    if (await _context.Characters.AnyAsync(c => c.Name.ToUpper() == character.Name.ToUpper() && c.BookId == character.BookId))
+    {
+      throw new ConflictException($"Character named \"{character.Name}\" already exists for this book.");
+    }
   }
 }

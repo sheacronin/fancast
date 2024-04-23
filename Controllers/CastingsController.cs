@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using System.Text.Json;
 using fancast.Models;
 using fancast.Services.AuthService;
 using fancast.Services.CastingsService;
@@ -122,7 +123,7 @@ public class CastingsController : ControllerBase
     }
     catch (Exception e)
     {
-      return BadRequest(e.Message);
+      return BadRequest(JsonSerializer.Serialize(e.Message));
     }
   }
 
@@ -141,7 +142,7 @@ public class CastingsController : ControllerBase
     }
     catch (Exception e)
     {
-      return BadRequest(e.Message);
+      return BadRequest(JsonSerializer.Serialize(e.Message));
     }
   }
 }

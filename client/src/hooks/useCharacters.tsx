@@ -30,6 +30,11 @@ export const useCharacters = (bookId: string) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(character),
       });
+
+      if (!response.ok) {
+        throw new Error(await response.json());
+      }
+
       const newCharacter = await response.json();
       dispatch({
         type: CharactersActionType.ADD_CHARACTER,
