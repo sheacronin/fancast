@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import { Home, Book, Register, Login } from './pages';
+import { Home, Book, Register, Login, Error } from './pages';
 import { AuthProvider, UnauthenticatedRoute, userLoader } from './context';
 import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
@@ -39,8 +39,8 @@ const router = createBrowserRouter([
         ],
       },
     ],
+    errorElement: <Error />,
   },
-  // TODO: errorElement: <Error />
 ]);
 
 const root = ReactDOM.createRoot(
