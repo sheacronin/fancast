@@ -10,7 +10,7 @@ export const Header = () => {
   return (
     <header>
       <Navbar bg="dark" className="mb-4 text-light" data-bs-theme="dark">
-        <Container>
+        <Container className="flex-wrap">
           <Navbar.Brand
             as={Link}
             to="/"
