@@ -1,7 +1,8 @@
 import { Form, Button } from 'react-bootstrap';
-import { useAuth } from '../context';
+import { useAuth, useAuthDispatch } from '../context';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import type { ChangeEvent } from 'react';
 
 interface AuthFormProps {
   formTitle: string;
@@ -21,8 +22,15 @@ export const AuthForm = ({
   confirmPassword = false,
 }: AuthFormProps) => {
   const validationSchema = yup.object({
-    username: yup.string().required('Username must not be empty.'),
-    password: yup.string().required('Password must not be empty.'),
+    username: yup
+      .string()
+      .required('Username must not be empty.')
+      .min(3, 'Username must be at least 3 characters.')
+      .max(18, 'Username must be no more than 18 characters.'),
+    password: yup
+      .string()
+      .required('Password must not be empty.')
+      .min(3, 'Password must be at least 3 characters.'),
     confirmPassword: confirmPassword
       ? yup
           .string()
@@ -36,7 +44,8 @@ export const AuthForm = ({
     onSubmit: (values) => onSubmit(values),
   });
 
-  const { error: authRequestError } = useAuth();
+  const { errors: resErrors } = useAuth();
+  const { clearErrors: clearResErrors } = useAuthDispatch();
 
   return (
     <Form
@@ -45,7 +54,6 @@ export const AuthForm = ({
       className="bg-dark text-light p-4 rounded"
     >
       <h2 className="h4">{formTitle}</h2>
-      {authRequestError && <p className="text-danger">{authRequestError}</p>}
       <Form.Group controlId="username" className="mb-3">
         <Form.Label>Username</Form.Label>
         <Form.Control
@@ -53,12 +61,12 @@ export const AuthForm = ({
           type="text"
           placeholder="Enter username"
           value={values.username}
-          onChange={handleChange}
-          isValid={touched.username && !errors.username}
-          isInvalid={touched.username && !!errors.username}
+          onChange={handleChangeAndClearResErrors}
+          isValid={isValid('username')}
+          isInvalid={isInvalid('username')}
         />
         <Form.Control.Feedback type="invalid">
-          {errors.username}
+          {renderErrors('username')}
         </Form.Control.Feedback>
       </Form.Group>
       <Form.Group controlId="password" className="mb-3">
@@ -68,12 +76,12 @@ export const AuthForm = ({
           type="password"
           placeholder="Password"
           value={values.password}
-          onChange={handleChange}
-          isValid={touched.password && !errors.password}
-          isInvalid={touched.password && !!errors.password}
+          onChange={handleChangeAndClearResErrors}
+          isValid={isValid('password')}
+          isInvalid={isInvalid('password')}
         />
         <Form.Control.Feedback type="invalid">
-          {errors.password}
+          {renderErrors('password')}
         </Form.Control.Feedback>
       </Form.Group>
       {confirmPassword && (
@@ -84,12 +92,12 @@ export const AuthForm = ({
             type="password"
             placeholder="Confirm Password"
             value={values.confirmPassword}
-            onChange={handleChange}
-            isValid={touched.confirmPassword && !errors.confirmPassword}
-            isInvalid={touched.password && !!errors.confirmPassword}
+            onChange={handleChangeAndClearResErrors}
+            isValid={isValid('confirmPassword') && isValid('password')}
+            isInvalid={isInvalid('confirmPassword')}
           />
           <Form.Control.Feedback type="invalid">
-            {errors.confirmPassword}
+            {renderErrors('confirmPassword')}
           </Form.Control.Feedback>
         </Form.Group>
       )}
@@ -98,4 +106,42 @@ export const AuthForm = ({
       </Button>
     </Form>
   );
+
+  function handleChangeAndClearResErrors(e: ChangeEvent) {
+    clearResErrors();
+    handleChange(e);
+  }
+
+  function renderErrors(field: keyof typeof values) {
+    const messages = [];
+    const inputError = errors[field];
+    if (inputError) {
+      messages.push(inputError);
+    }
+    if (!!resErrors && !!resErrors[field] && resErrors[field].length > 0) {
+      messages.push(...resErrors[field]);
+    }
+
+    return messages.map((msg) => (
+      <p key={msg} className="mb-1">
+        {msg}
+      </p>
+    ));
+  }
+
+  function isValid(field: keyof typeof values) {
+    return (
+      touched[field] &&
+      !errors[field] &&
+      (!resErrors || !resErrors[field] || resErrors[field].length === 0)
+    );
+  }
+
+  function isInvalid(field: keyof typeof values) {
+    return (
+      touched[field] &&
+      (!!errors[field] ||
+        (!!resErrors && resErrors[field] && resErrors[field].length > 0))
+    );
+  }
 };

@@ -1,8 +1,8 @@
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Text;
-using System.Text.Json;
 using System.IdentityModel.Tokens.Jwt;
 using fancast.Models;
 using fancast.Data;
@@ -44,61 +44,55 @@ public class AuthService : IAuthService
   public async Task<User?> FindUser(string username) =>
     await _context.Users.Include(u => u.Castings).SingleOrDefaultAsync(u => u.Username == username);
 
-  public async Task<string> ValidateRegistration(UserDto userDto)
+  public async Task<ValidationProblemDetails?> ValidateRegistration(UserDto userDto)
   {
-    string emptyError = ValidateNotEmpty(userDto);
-    if (emptyError != string.Empty)
-    {
-      return emptyError;
-    }
+    Dictionary<string, string[]> details = new();
 
-    if (await _context.Users.AnyAsync(u => u.Username == userDto.Username))
+    if (await IsUsernameTaken(userDto.Username))
     {
-      return JsonSerializer.Serialize("Username is taken.");
+      string[] errors = { "Username is taken." };
+      details["Username"] = errors;
+      return new ValidationProblemDetails(details)
+      {
+        Status = 409
+      };
     }
 
     if (userDto.Password != userDto.ConfirmPassword)
     {
-      return JsonSerializer.Serialize("Passwords do not match.");
+      string[] errors = { "Passwords do not match." };
+      details["ConfirmPassword"] = errors;
+      return new ValidationProblemDetails(details);
     }
 
-    return string.Empty;
+    return null;
   }
 
-  public string ValidateLogin(UserDto userDto, User? user)
+  private async Task<bool> IsUsernameTaken(string username) =>
+    await _context.Users.AnyAsync(u => u.Username == username);
+
+  public ValidationProblemDetails? ValidateLogin(UserDto userDto, User? user)
   {
-    string emptyError = ValidateNotEmpty(userDto);
-    if (emptyError != string.Empty)
-    {
-      return emptyError;
-    }
+    Dictionary<string, string[]> details = new();
 
     if (user == null)
     {
-      return JsonSerializer.Serialize("User not found.");
+      string[] errors = { "User not found." };
+      details["Username"] = errors;
+      return new ValidationProblemDetails(details)
+      {
+        Status = 404
+      };
     }
 
     if (!BCrypt.Net.BCrypt.Verify(userDto.Password, user.PasswordHash))
     {
-      return JsonSerializer.Serialize("Wrong password.");
+      string[] errors = { "Wrong password." };
+      details["Password"] = errors;
+      return new ValidationProblemDetails(details);
     }
 
-    return string.Empty;
-  }
-
-  public string ValidateNotEmpty(UserDto userDto)
-  {
-    if (userDto.Username == string.Empty)
-    {
-      return JsonSerializer.Serialize("Username must not be empty.");
-    }
-
-    if (userDto.Password == string.Empty)
-    {
-      return JsonSerializer.Serialize("Password must not be empty.");
-    }
-
-    return string.Empty;
+    return null;
   }
 
   public string CreateToken(User user)

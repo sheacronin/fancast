@@ -7,27 +7,38 @@ import {
   Navigate,
   useLoaderData,
 } from 'react-router-dom';
+import { useResponseErrors } from '../hooks/useResponseErrors';
 import type { Dispatch } from 'react';
 import type { User } from '../types';
+import type { ResponseErrors } from '../hooks/useResponseErrors';
 
-export const AuthContext = createContext<AuthInfo>({ user: null, error: '' });
-export const AuthDispatchContext = createContext<Dispatch<AuthAction>>(
-  () => null
-);
+export const AuthContext = createContext<AuthInfo>({
+  user: null,
+  errors: null,
+});
+export const AuthDispatchContext = createContext<AuthDispatch>({
+  dispatch: () => null,
+  setResErrors: () => null,
+  clearErrors: () => null,
+});
 
 interface AuthInfo {
   user: User | null;
-  error: string;
+  errors: ResponseErrors | null;
+}
+
+interface AuthDispatch {
+  dispatch: Dispatch<AuthAction>;
+  setResErrors: (errors: ResponseErrors) => void;
+  clearErrors: () => void;
 }
 
 enum AuthActionType {
   LOGIN = 'LOGIN',
   LOGOUT = 'LOGOUT',
-  ERROR = 'ERROR',
-  CLEAR_ERROR = 'CLEAR_ERROR',
 }
 
-type AuthAction = ActionLogin | ActionLogout | ActionError | ActionClearError;
+type AuthAction = ActionLogin | ActionLogout;
 
 interface ActionLogin {
   type: AuthActionType.LOGIN;
@@ -38,34 +49,27 @@ interface ActionLogout {
   type: AuthActionType.LOGOUT;
 }
 
-interface ActionError {
-  type: AuthActionType.ERROR;
-  payload: string;
-}
-
-interface ActionClearError {
-  type: AuthActionType.CLEAR_ERROR;
-}
-
 export const AuthProvider = () => {
   const user = useLoaderData() as User;
+  const { errors, setResErrors, clearErrors } = useResponseErrors();
   const [authInfo, dispatch] = useReducer(authReducer, {
     user,
-    error: '',
   });
   const location = useLocation();
 
   // Clear errors when user navigates to different page
   useEffect(() => {
-    if (authInfo.error) {
-      dispatch({ type: AuthActionType.CLEAR_ERROR });
+    if (errors) {
+      clearErrors();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
   return (
-    <AuthContext.Provider value={authInfo}>
-      <AuthDispatchContext.Provider value={dispatch}>
+    <AuthContext.Provider value={{ ...authInfo, errors }}>
+      <AuthDispatchContext.Provider
+        value={{ dispatch, setResErrors, clearErrors }}
+      >
         <Outlet />
       </AuthDispatchContext.Provider>
     </AuthContext.Provider>
@@ -103,10 +107,13 @@ export const useAuth = () => {
 };
 
 export const useAuthDispatch = () => {
-  const dispatch = useContext(AuthDispatchContext);
+  const { dispatch, setResErrors, clearErrors } =
+    useContext(AuthDispatchContext);
   const navigate = useNavigate();
 
   const login = async (username: string, password: string) => {
+    clearErrors();
+
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -121,8 +128,8 @@ export const useAuthDispatch = () => {
       dispatch({ type: AuthActionType.LOGIN, payload: user });
       navigate('/', { replace: true });
     } else {
-      const error = await response.json();
-      dispatch({ type: AuthActionType.ERROR, payload: error });
+      const { errors } = await response.json();
+      setResErrors(errors);
     }
   };
 
@@ -137,6 +144,8 @@ export const useAuthDispatch = () => {
     password: string,
     confirmPassword: string
   ) => {
+    clearErrors();
+
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -150,24 +159,23 @@ export const useAuthDispatch = () => {
     if (response.ok) {
       navigate('/login');
     } else {
-      const error = await response.json();
-      dispatch({ type: AuthActionType.ERROR, payload: error });
+      const { errors } = await response.json();
+      setResErrors(errors);
     }
   };
 
-  return { login, logout, register };
+  return { login, logout, register, clearErrors };
 };
 
-const authReducer = (authInfo: AuthInfo, action: AuthAction) => {
+const authReducer = (
+  authInfo: Omit<AuthInfo, 'errors'>,
+  action: AuthAction
+) => {
   switch (action.type) {
     case AuthActionType.LOGIN:
       return { ...authInfo, user: action.payload || null };
     case AuthActionType.LOGOUT:
       return { ...authInfo, user: null };
-    case AuthActionType.ERROR:
-      return { ...authInfo, error: action.payload };
-    case AuthActionType.CLEAR_ERROR:
-      return { ...authInfo, error: '' };
     default:
       return authInfo;
   }

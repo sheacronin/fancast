@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using fancast.Models;
 using fancast.Services.AuthService;
 
@@ -31,12 +30,16 @@ public class AuthController : ControllerBase
   }
 
   [HttpPost("register")]
-  public async Task<ActionResult<User>> Register(UserDto userDto)
+  public async Task<ActionResult<User>> Register([FromBody] UserDto userDto)
   {
-    string error = await _authService.ValidateRegistration(userDto);
-    if (error != string.Empty)
+    var problem = await _authService.ValidateRegistration(userDto);
+    if (problem is not null)
     {
-      return BadRequest(error);
+      if (problem.Status == 409)
+      {
+        return Conflict(problem);
+      }
+      return BadRequest(problem);
     }
 
     User user = await _authService.CreateUser(userDto);
@@ -44,14 +47,18 @@ public class AuthController : ControllerBase
   }
 
   [HttpPost("login")]
-  public async Task<ActionResult<User>> Login(UserDto userDto)
+  public async Task<ActionResult<User>> Login([FromBody] UserDto userDto)
   {
     User? user = await _authService.FindUser(userDto.Username);
 
-    string error = _authService.ValidateLogin(userDto, user);
-    if (error != string.Empty)
+    var problem = _authService.ValidateLogin(userDto, user);
+    if (problem is not null)
     {
-      return BadRequest(error);
+      if (problem.Status == 404)
+      {
+        return NotFound(problem);
+      }
+      return BadRequest(problem);
     }
 
     string token = _authService.CreateToken(user!);
