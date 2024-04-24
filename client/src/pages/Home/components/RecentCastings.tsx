@@ -66,68 +66,74 @@ export const RecentCastings = () => {
           xl={4}
           className="row-gap-3 align-items-stretch"
         >
-          {castings.map(({ id, book, character, actor, users }) => (
-            <Col key={id}>
-              <Card as="article" className="h-100">
-                <div className="d-flex">
-                  <Card.Img
-                    src={book!.imageLink}
-                    variant="top"
-                    className="w-50 object-fit-cover"
-                    style={{ borderTopRightRadius: 0 }}
-                  />
-                  <Card.Img
-                    src={actor.imageLink || defaultActorImageAlt}
-                    variant="top"
-                    className="w-50 object-fit-cover"
-                    style={{ borderTopLeftRadius: 0 }}
-                  />
-                </div>
-                <Card.Body className="d-flex flex-column justify-content-center">
-                  <Card.Title as="h6">
-                    {actor.name} as {character!.name}
-                  </Card.Title>
-                  <Card.Text>
-                    <Link to={`/books/${book!.id}`}>{book!.title}</Link>
-                  </Card.Text>
-                </Card.Body>
-                <Card.Footer>
-                  <Stack direction="horizontal" gap={2} className="flex-wrap">
-                    {!users || users.length === 0 ? (
-                      <Badge
-                        pill
-                        className="bg-secondary text-dark text-uppercase fw-normal"
-                      >
-                        N/A
-                      </Badge>
-                    ) : (
-                      <>
-                        {users.slice(0, 6).map((u) => (
-                          <Badge
-                            key={u.id}
-                            bg="primary"
-                            pill
-                            className="text-uppercase fw-normal"
-                          >
-                            {u.username}
-                          </Badge>
-                        ))}
-                        {users!.length > 7 && (
-                          <Badge
-                            bg="primary"
-                            pill
-                            className="text-uppercase fw-normal"
-                          >
-                            ...
-                          </Badge>
-                        )}
-                      </>
-                    )}
-                  </Stack>
-                </Card.Footer>
-              </Card>
+          {castings.length > 0 ? (
+            castings.map(({ id, book, character, actor, users }) => (
+              <Col key={id}>
+                <Card as="article" className="h-100">
+                  <div className="d-flex">
+                    <Card.Img
+                      src={book!.imageLink}
+                      variant="top"
+                      className="w-50 object-fit-cover"
+                      style={{ borderTopRightRadius: 0 }}
+                    />
+                    <Card.Img
+                      src={actor.imageLink || defaultActorImageAlt}
+                      variant="top"
+                      className="w-50 object-fit-cover"
+                      style={{ borderTopLeftRadius: 0 }}
+                    />
+                  </div>
+                  <Card.Body className="d-flex flex-column justify-content-center">
+                    <Card.Title as="h6">
+                      {actor.name} as {character!.name}
+                    </Card.Title>
+                    <Card.Text>
+                      <Link to={`/books/${book!.id}`}>{book!.title}</Link>
+                    </Card.Text>
+                  </Card.Body>
+                  <Card.Footer>
+                    <Stack direction="horizontal" gap={2} className="flex-wrap">
+                      {!users || users.length === 0 ? (
+                        <Badge
+                          pill
+                          className="bg-secondary text-dark text-uppercase fw-normal"
+                        >
+                          N/A
+                        </Badge>
+                      ) : (
+                        <>
+                          {users.slice(0, 6).map((u) => (
+                            <Badge
+                              key={u.id}
+                              bg="primary"
+                              pill
+                              className="text-uppercase fw-normal"
+                            >
+                              {u.username}
+                            </Badge>
+                          ))}
+                          {users!.length > 7 && (
+                            <Badge
+                              bg="primary"
+                              pill
+                              className="text-uppercase fw-normal"
+                            >
+                              ...
+                            </Badge>
+                          )}
+                        </>
+                      )}
+                    </Stack>
+                  </Card.Footer>
+                </Card>
+              </Col>
+            ))
+          ) : (
+            <Col xs={12} className="text-center text-info w-100">
+              No castings to show.
             </Col>
-          ))}
+          )}
         </Row>
       )}
     </Col>
