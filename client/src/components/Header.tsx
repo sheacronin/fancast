@@ -1,10 +1,18 @@
 import { Link } from 'react-router-dom';
-import { Navbar, Nav, Container, Stack, Button, Image } from 'react-bootstrap';
+import {
+  Navbar,
+  Nav,
+  Container,
+  Stack,
+  Button,
+  Image,
+  Spinner,
+} from 'react-bootstrap';
 import { useAuth, useAuthDispatch } from '../context';
 import fancastLogo from '../assets/fancast_logo.png';
 
 export const Header = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { logout } = useAuthDispatch();
 
   return (
@@ -35,7 +43,20 @@ export const Header = () => {
                   Welcome, {user.username}
                 </Nav.Item>
                 <Nav.Item as={Button} onClick={logout}>
-                  Logout
+                  {!loading ? (
+                    'Logout'
+                  ) : (
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      variant="secondary"
+                      className="mx-3"
+                    >
+                      <span className="visually-hidden">Loading...</span>
+                    </Spinner>
+                  )}
                 </Nav.Item>
               </>
             )}

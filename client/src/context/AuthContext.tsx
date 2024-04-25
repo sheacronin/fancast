@@ -14,6 +14,7 @@ import type { ResponseErrors } from '../hooks/useResponseErrors';
 
 export const AuthContext = createContext<AuthInfo>({
   user: null,
+  loading: false,
   errors: null,
 });
 export const AuthDispatchContext = createContext<AuthDispatch>({
@@ -24,6 +25,7 @@ export const AuthDispatchContext = createContext<AuthDispatch>({
 
 interface AuthInfo {
   user: User | null;
+  loading: boolean;
   errors: ResponseErrors | null;
 }
 
@@ -36,9 +38,10 @@ interface AuthDispatch {
 enum AuthActionType {
   LOGIN = 'LOGIN',
   LOGOUT = 'LOGOUT',
+  SET_LOADING = 'SET_LOADING',
 }
 
-type AuthAction = ActionLogin | ActionLogout;
+type AuthAction = ActionLogin | ActionLogout | ActionSetLoading;
 
 interface ActionLogin {
   type: AuthActionType.LOGIN;
@@ -49,11 +52,17 @@ interface ActionLogout {
   type: AuthActionType.LOGOUT;
 }
 
+interface ActionSetLoading {
+  type: AuthActionType.SET_LOADING;
+  payload: boolean;
+}
+
 export const AuthProvider = () => {
   const user = useLoaderData() as User;
   const { errors, setResErrors, clearErrors } = useResponseErrors();
   const [authInfo, dispatch] = useReducer(authReducer, {
     user,
+    loading: false,
   });
   const location = useLocation();
 
@@ -113,6 +122,7 @@ export const useAuthDispatch = () => {
 
   const login = async (username: string, password: string) => {
     clearErrors();
+    dispatch({ type: AuthActionType.SET_LOADING, payload: true });
 
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
@@ -131,11 +141,14 @@ export const useAuthDispatch = () => {
       const { errors } = await response.json();
       setResErrors(errors);
     }
+    dispatch({ type: AuthActionType.SET_LOADING, payload: false });
   };
 
   const logout = async () => {
+    dispatch({ type: AuthActionType.SET_LOADING, payload: true });
     await fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST' });
     dispatch({ type: AuthActionType.LOGOUT });
+    dispatch({ type: AuthActionType.SET_LOADING, payload: false });
     navigate('/');
   };
 
@@ -145,6 +158,7 @@ export const useAuthDispatch = () => {
     confirmPassword: string
   ) => {
     clearErrors();
+    dispatch({ type: AuthActionType.SET_LOADING, payload: true });
 
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
@@ -162,6 +176,7 @@ export const useAuthDispatch = () => {
       const { errors } = await response.json();
       setResErrors(errors);
     }
+    dispatch({ type: AuthActionType.SET_LOADING, payload: false });
   };
 
   return { login, logout, register, clearErrors };
@@ -176,6 +191,8 @@ const authReducer = (
       return { ...authInfo, user: action.payload || null };
     case AuthActionType.LOGOUT:
       return { ...authInfo, user: null };
+    case AuthActionType.SET_LOADING:
+      return { ...authInfo, loading: action.payload };
     default:
       return authInfo;
   }

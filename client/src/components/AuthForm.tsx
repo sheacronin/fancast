@@ -1,4 +1,4 @@
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button, Spinner } from 'react-bootstrap';
 import { useAuth, useAuthDispatch } from '../context';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -44,7 +44,7 @@ export const AuthForm = ({
     onSubmit: (values) => onSubmit(values),
   });
 
-  const { errors: resErrors } = useAuth();
+  const { errors: resErrors, loading } = useAuth();
   const { clearErrors: clearResErrors } = useAuthDispatch();
 
   return (
@@ -101,8 +101,21 @@ export const AuthForm = ({
           </Form.Control.Feedback>
         </Form.Group>
       )}
-      <Button variant="primary" type="submit">
-        Submit
+      <Button variant="primary" type="submit" disabled={loading}>
+        {!loading ? (
+          'Submit'
+        ) : (
+          <Spinner
+            as="span"
+            animation="border"
+            size="sm"
+            role="status"
+            variant="secondary"
+            className="mx-3"
+          >
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+        )}
       </Button>
     </Form>
   );
