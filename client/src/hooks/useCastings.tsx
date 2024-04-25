@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useReducer } from 'react';
-import { Casting } from '../types';
 import { API_BASE_URL } from '../constants';
 import defaultActorImage from '../assets/default_actor.jpg';
+import type { Casting, Actor } from '../types';
 
 enum CastingsActionType {
   SET_LOADING = 'SET_LOADING',
@@ -179,15 +179,17 @@ interface ActionAddCasting {
   payload: Casting[];
 }
 
-const CASTING_PLACEHOLDER: Casting = {
+const ACTOR_PLACEHOLDER: Actor = {
+  id: -1,
+  name: 'Placeholder person',
+  gender: 'nonbinary',
+  imageLink: defaultActorImage,
+};
+
+export const CASTING_PLACEHOLDER: Casting = {
   id: -1,
   characterId: -1,
   createdAt: new Date('1/1/2000'),
   actorId: -1,
-  actor: {
-    id: -1,
-    name: 'Unknown person',
-    gender: 'nonbinary',
-    imageLink: defaultActorImage,
-  },
+  actor: ACTOR_PLACEHOLDER,
 };

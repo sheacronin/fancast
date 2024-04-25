@@ -8,7 +8,7 @@ import {
 } from 'react-bootstrap';
 import { CastingModal } from './CastingModal';
 import { ActorImage } from '../../../components';
-import { useCastings } from '../../../hooks/useCastings';
+import { useCastings, CASTING_PLACEHOLDER } from '../../../hooks/useCastings';
 import { useAuth } from '../../../context';
 
 interface CharacterProps {
@@ -50,15 +50,19 @@ export const Character = ({ id, name }: CharacterProps) => {
       variant="dark"
       indicators={false}
       className={
-        'custom-carousel' + (castings.length === 1 ? ' single-carousel' : '')
+        'custom-carousel' + (castings.length <= 1 ? ' single-carousel' : '')
       }
     >
-      {castings.map(({ id, actor }) => (
-        <Carousel.Item key={id}>
-          <ActorImage actor={actor} width={50} />
-          <p className="mt-4 mb-0">{actor.name}</p>
-        </Carousel.Item>
-      ))}
+      {(castings.length > 0 ? castings : [CASTING_PLACEHOLDER]).map(
+        ({ id, actor }) => (
+          <Carousel.Item key={id}>
+            <ActorImage actor={actor} width={50} />
+            <p className="mt-4 mb-0">
+              {id !== -1 ? actor.name : <i>No castings</i>}
+            </p>
+          </Carousel.Item>
+        )
+      )}
     </Carousel>
   );
 
