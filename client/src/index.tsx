@@ -2,14 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { Home, Book, Register, Login, Error } from './pages';
-import { AuthProvider, UnauthenticatedRoute, userLoader } from './context';
+import { AuthProvider, flyRedirect, UnauthenticatedRoute } from './context';
 import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import './index.scss';
 
 const router = createBrowserRouter([
   {
-    loader: userLoader,
+    loader: flyRedirect,
     element: <AuthProvider />,
     children: [
       {

@@ -6,6 +6,7 @@ import {
   useNavigate,
   Navigate,
   useLoaderData,
+  redirect,
 } from 'react-router-dom';
 import { useResponseErrors } from '../hooks/useResponseErrors';
 import type { Dispatch } from 'react';
@@ -103,6 +104,8 @@ export const userLoader = async () => {
     return null;
   }
 };
+
+export const flyRedirect = () => redirect('https://fancast.fly.dev/', 301);
 
 export const UnauthenticatedRoute = () => {
   const { user } = useAuth();
