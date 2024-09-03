@@ -1,6 +1,6 @@
 # <img width="30" alt="Fancast Icon" src="./client/src/assets/fancast_logo_primary.png"> Fancast
 
-🔗 Live site at [fancast.onrender.com](https://fancast.onrender.com/).
+🔗 Live site at [fancast.fly.dev](https://fancast.fly.dev/).
 
 Fancast is a full-stack web application for selecting actors you would cast as characters in books. The home page displays recent castings that have been made -- unauthenticated users will see all recent castings, and logged in users will see their own latest selection of actors to play various characters.
 
